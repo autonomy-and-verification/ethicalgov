@@ -1,0 +1,12 @@
+
+MAS egsim {
+
+    infrastructure: Centralised
+
+    environment: EthGovs
+
+    agents: human; governors;
+    
+    aslSourcePath:
+		"src/asl";
+}
