@@ -1,0 +1,27 @@
+/bin
+/bin/
+backup/
+cache/
+/perceptlog/
+perceptlog/
+*.raw
+*.log
+xmls/
+*~
+*.bk
+e_r_r_o_r.txt
+.stop___MAS
+
+
+### Gradle ### 
+.gradle
+/build/
+
+# Ignore Gradle GUI config
+gradle-app.setting
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# Cache of project
+.gradletasknamecache
