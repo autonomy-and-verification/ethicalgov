@@ -5,7 +5,8 @@ MAS egsim {
 
     environment: EthGovs
 
-    agents: human; governors;
+    agents: human; 
+    governors;
     
     aslSourcePath:
 		"src/asl";

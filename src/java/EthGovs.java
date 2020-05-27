@@ -44,7 +44,6 @@ public class EthGovs extends Environment {
 	
 	public boolean blocked = false;
 	public boolean pickChoice = true;
-	public boolean goalAchieved = false;
 	public boolean active = true;
 	
 	public int proximityCount = 0;
@@ -123,21 +122,22 @@ public class EthGovs extends Environment {
             } else if (action.equals(p12)) { //At human, human not in danger, proximity count > 3
                 safetyChoice = "12 1"; //Safety says Stay Put, with a score of 1
 				autonomyChoice = "22 3"; //Autonomy says Move Away, with a score of 3
+            } else if (action.getFunctor().equals("move")) {
+            	model.humanMove(); //Human can now move
+        		updatePercepts(); //Update percepts ready for the next reasoning cycle
+                try {
+                    Thread.sleep(400); // wait o.2 seconds before next reasoning cycle
+                } catch (Exception e) {}
+                informAgsEnvironmentChanged();
             }
-			if(safetyChoice != null && autonomyChoice != null){ //Once both choices have been made
+			if(ag.contentEquals("governors") && safetyChoice != null && autonomyChoice != null){ //Once both choices have been made
 				logger.info(ag + " Chose " + action); //Show in the log file what plan the governors agent chose
 				model.arbiterChoice();
-				model.humanMove(); //Human can now move
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		updatePercepts(); //Update percepts ready for the next reasoning cycle
-        try {
-            Thread.sleep(400); // wait o.2 seconds before next reasoning cycle
-        } catch (Exception e) {}
-        informAgsEnvironmentChanged();
-		
+
         return true;
     }
 
@@ -162,6 +162,8 @@ public class EthGovs extends Environment {
 		Literal haz4 = Literal.parseLiteral("pos(hazard," + hazLoc4.x + "," + hazLoc4.y + ")");
 		Literal haz5 = Literal.parseLiteral("pos(hazard," + hazLoc5.x + "," + hazLoc5.y + ")");
 		
+		Literal step = Literal.parseLiteral("new_step");
+		
 		// All percepts added
         addPercept(pos1);
 		addPercept(pos2);
@@ -171,6 +173,9 @@ public class EthGovs extends Environment {
 		addPercept(haz4);
 		addPercept(haz5);
 		addPercept(proxCount);
+		addPercept(step);
+		
+		
     }
 	
     class EGModel extends GridWorldModel {
@@ -727,7 +732,6 @@ public class EthGovs extends Environment {
 				if(humanTimer == 0) { 
 					active = true; // When the timer reaches zero, human becomes active again
 					pickChoice = true; //Allows him to pick another choice
-					goalAchieved = true;
 					humanTimer = 9; //Timer set back to 9, ready for the next time
 					if(currentGoalStep == 5) { //This simply sets the human on and endless loop, so that the simulation doesnt reach a definitive end
 						currentGoalStep = 0;
@@ -735,6 +739,7 @@ public class EthGovs extends Environment {
 				}
 			}
 		}
+		
 		boolean isInRadius(Location input, Location target) { //This method is used to test if the input is 1 square away from the target
 			if((input.x == target.x-1) && (input.y == target.y+1) ||
 			   (input.x == target.x) && (input.y == target.y+1) ||
@@ -766,9 +771,11 @@ public class EthGovs extends Environment {
             switch (object) {
 				case EthGovs.HAZARD:
 					drawHazard(g, x, y);
+					logger.info("Hazard pos "+g+" "+x+" "+y);
 					break;
 				case EthGovs.GOAL:
 					drawGoal(g, x, y);
+					logger.info("Goal pos "+g+" "+x+" "+y);
 					break; //Going to have to modify this bit for the hazard
             } 
         }

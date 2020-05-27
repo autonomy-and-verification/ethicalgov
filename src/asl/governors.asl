@@ -13,53 +13,89 @@ inDanger2(A) :- inDanger1(A) | near2(hazard, A).
 annoyed :- proximityScore(A) & A > 3.
 
 //Initial Goal
-!checkOnHuman(human).
+//!checkOnHuman(human).
 
 //Agent's plans
++new_step 
+<- 
+	-new_step[source(_)];
+ 	!checkOnHuman(human);
+ 	.
+ 	
++!human_step
+<- 
+	.send(human, achieve, act);
+	.
+
+
 +!checkOnHuman(human) : inDanger2(human) & not at(human) & not near1(human) & not annoyed
-		<- plan1;
-		   !checkOnHuman(human).
+<- 
+	plan1;
+	!human_step;
+	.
 		   
 +!checkOnHuman(human) : inDanger2(human) & not at(human) & not near1(human) & annoyed
-		<- plan2;
-		   !checkOnHuman(human).
+<- 
+	plan2;
+	!human_step;
+	.
 		   
 +!checkOnHuman(human) : not inDanger2(human) & not at(human) & not near1(human) & not annoyed
-		<- plan3;
-		   !checkOnHuman(human).
+<- 
+	plan3;
+	!human_step;
+	.
 		   
 +!checkOnHuman(human) : not inDanger2(human) & not at(human) & not near1(human) & annoyed
-		<- plan4;
-		   !checkOnHuman(human).
+<- 
+	plan4;
+	!human_step;
+	.
 		   
 +!checkOnHuman(human) : inDanger2(human) & not at(human) & near1(human) & not annoyed
-		<- plan5;
-		   !checkOnHuman(human).
+<- 
+	plan5;
+	!human_step;
+	.
 		   
 +!checkOnHuman(human) : inDanger2(human) & not at(human) & near1(human) & annoyed
-		<- plan6;
-		   !checkOnHuman(human).
+<- 
+	plan6;
+	!human_step;
+	.
 		   
 +!checkOnHuman(human) : not inDanger2(human) & not at(human) & near1(human) & not annoyed
-		<- plan7;
-		   !checkOnHuman(human).
+<- 
+	plan7;
+	!human_step;
+	.
 		   
 +!checkOnHuman(human) : not inDanger2(human) & not at(human) & near1(human) & annoyed
-		<- plan8;
-		   !checkOnHuman(human).
+<- 
+	plan8;
+	!human_step;
+	.
 		   
 +!checkOnHuman(human) : inDanger2(human) & at(human) & not annoyed
-		<- plan9;
-		   !checkOnHuman(human).
+<- 
+	plan9;
+	!human_step;
+	.
 		 
 +!checkOnHuman(human) : inDanger2(human) & at(human) & annoyed
-		<- plan10;
-		   !checkOnHuman(human).
+<- 
+	plan10;
+	!human_step;
+	.
 		
 +!checkOnHuman(human) : not inDanger2(human) & at(human) & not annoyed
-		<- plan11;
-		   !checkOnHuman(human).
+<- 
+	plan11;
+	!human_step;
+	.
 		   
 +!checkOnHuman(human) : not inDanger2(human) & at(human) & annoyed
-		<- plan12;
-		   !checkOnHuman(human).
+<- 
+	plan12;
+	!human_step;
+	.
