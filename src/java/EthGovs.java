@@ -79,7 +79,7 @@ public class EthGovs extends Environment {
         model = new EGModel();
         view  = new EGView(model);
         model.setView(view);
-        updatePercepts();
+        updatePerceptsStart();
     } //This method is required at the start of every environment. This method becomes before anything else and prevented me from user input last year.
 
     @Override
@@ -124,6 +124,8 @@ public class EthGovs extends Environment {
 				autonomyChoice = "22 3"; //Autonomy says Move Away, with a score of 3
             } else if (action.getFunctor().equals("move")) {
             	model.humanMove(); //Human can now move
+            }
+            if (action.getFunctor().equals("move") || action.getFunctor().equals("skip")) {
         		updatePercepts(); //Update percepts ready for the next reasoning cycle
                 try {
                     Thread.sleep(400); // wait o.2 seconds before next reasoning cycle
@@ -140,9 +142,9 @@ public class EthGovs extends Environment {
 
         return true;
     }
-
+    
     /** creates the agents perception based on the EGModel */
-    void updatePercepts() { // Method for updating the agent's beliefs - Necessary method
+    void updatePerceptsStart() { // Method for updating the agent's beliefs - Necessary method
         clearPercepts();
 
         Location humanLoc = model.getAgPos(0); // Locations of agents positions
@@ -162,6 +164,13 @@ public class EthGovs extends Environment {
 		Literal haz4 = Literal.parseLiteral("pos(hazard," + hazLoc4.x + "," + hazLoc4.y + ")");
 		Literal haz5 = Literal.parseLiteral("pos(hazard," + hazLoc5.x + "," + hazLoc5.y + ")");
 		
+		// Locations of goals as percepts
+		Literal gloc1 = Literal.parseLiteral("goal(1," + loc1.x + "," + loc1.y + ")");
+		Literal gloc2 = Literal.parseLiteral("goal(2," + loc2.x + "," + loc2.y + ")");
+		Literal gloc3 = Literal.parseLiteral("goal(3," + loc3.x + "," + loc3.y + ")");
+		Literal gloc4 = Literal.parseLiteral("goal(4," + loc4.x + "," + loc4.y + ")");
+		Literal gloc5 = Literal.parseLiteral("goal(5," + loc5.x + "," + loc5.y + ")");
+		
 		Literal step = Literal.parseLiteral("new_step");
 		
 		// All percepts added
@@ -172,6 +181,36 @@ public class EthGovs extends Environment {
 		addPercept(haz3);
 		addPercept(haz4);
 		addPercept(haz5);
+		addPercept(gloc1);
+		addPercept(gloc2);
+		addPercept(gloc3);
+		addPercept(gloc4);
+		addPercept(gloc5);
+		addPercept(proxCount);
+		addPercept(step);
+		
+		
+    }
+
+    /** creates the agents perception based on the EGModel */
+    void updatePercepts() { // Method for updating the agent's beliefs - Necessary method
+        clearPercepts();
+
+        Location humanLoc = model.getAgPos(0); // Locations of agents positions
+		Location robotLoc = model.getAgPos(1);
+		
+		// Positions of human, and robot, as percepts
+        Literal pos1 = Literal.parseLiteral("pos(human," + humanLoc.x + "," + humanLoc.y + ")"); // Belief for positions will be saved in this format
+		Literal pos2 = Literal.parseLiteral("pos(governors," + robotLoc.x + "," + robotLoc.y + ")");
+		
+		// Proximity Count as a percept
+		Literal proxCount = Literal.parseLiteral("proximityScore(" + proximityCount + ")");
+		
+		Literal step = Literal.parseLiteral("new_step");
+		
+		// All percepts added
+        addPercept(pos1);
+		addPercept(pos2);
 		addPercept(proxCount);
 		addPercept(step);
 		
@@ -771,11 +810,11 @@ public class EthGovs extends Environment {
             switch (object) {
 				case EthGovs.HAZARD:
 					drawHazard(g, x, y);
-					logger.info("Hazard pos "+g+" "+x+" "+y);
+//					logger.info("Hazard pos "+g+" "+x+" "+y);
 					break;
 				case EthGovs.GOAL:
 					drawGoal(g, x, y);
-					logger.info("Goal pos "+g+" "+x+" "+y);
+//					logger.info("Goal pos "+g+" "+x+" "+y);
 					break; //Going to have to modify this bit for the hazard
             } 
         }
