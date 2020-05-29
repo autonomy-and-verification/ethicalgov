@@ -1,16 +1,6 @@
 // THE HUMAN
 
 goal_step(1).
-
-at(P) :- pos(P,X,Y) & pos(human,X,Y). // at(P) means for position (P,X,Y) and the human is at that position
-near1(A,B) :-  pos(A,X,Y) & pos(B,X-1,Y) | //May be some logical errors with this initial setof beliefs - find out during testing
-			   pos(A,X,Y) & pos(B,X-1,Y-1) |
-			   pos(A,X,Y) & pos(B,X,Y-1) |
-			   pos(A,X,Y) & pos(B,X+1,Y+1) |
-			   pos(A,X,Y) & pos(B,X+1,Y) |
-			   pos(A,X,Y) & pos(B,X+1,Y-1) |
-			   pos(A,X,Y) & pos(B,X,Y+1) |
-			   pos(A,X,Y) & pos(B,X-1,Y+1).
 			   
 //+!act <- move.
 
@@ -54,29 +44,6 @@ near1(A,B) :-  pos(A,X,Y) & pos(B,X-1,Y) | //May be some logical errors with thi
 +!act : achieving_goal(X,Y)
 <-
 	!move(X,Y);
-	.
-	
-+!move(GX,GY) : blocked(false) & pos(human,HX,HY)
-<-
-	if (HX < GX) {
-		X = HX + 1;
-	}
-	elif (HX > GX) {
-		X = HX - 1;
-	}
-	else {
-		X = HX;
-	}
-	if (HY < GY) {
-		Y = HY + 1;
-	}
-	elif (HY > GY) {
-		Y = HY - 1;
-	}
-	else {
-		Y = HY;
-	}
-	move(X,Y);
 	.
 	
 +!move(GX,GY) : blocked(true) & pos(human,HX,HY)
@@ -131,5 +98,26 @@ near1(A,B) :-  pos(A,X,Y) & pos(B,X-1,Y) | //May be some logical errors with thi
 	move(X,Y);
 	.
 	
-	
++!move(GX,GY) : pos(human,HX,HY)
+<-
+	if (HX < GX) {
+		X = HX + 1;
+	}
+	elif (HX > GX) {
+		X = HX - 1;
+	}
+	else {
+		X = HX;
+	}
+	if (HY < GY) {
+		Y = HY + 1;
+	}
+	elif (HY > GY) {
+		Y = HY - 1;
+	}
+	else {
+		Y = HY;
+	}
+	move(X,Y);
+	.
 	
