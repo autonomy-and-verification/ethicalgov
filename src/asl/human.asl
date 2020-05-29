@@ -81,8 +81,54 @@ near1(A,B) :-  pos(A,X,Y) & pos(B,X-1,Y) | //May be some logical errors with thi
 	
 +!move(GX,GY) : blocked(true) & pos(human,HX,HY)
 <-
-	.print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-//	move(X,Y);
+	if (HX < GX) {
+		if (pos(hazard,HX+1,HY)) {
+			X = HX + 1;
+			Y = HY + 1;
+		}
+		else {
+			X = HX + 1;
+		}
+		unblock;
+	}
+	elif (HX > GX) {
+		if (pos(hazard,HX-1,HY)) {
+			X = HX - 1;
+			Y = HY - 1;
+		}
+		else {
+			X = HX - 1;
+		}
+		unblock;
+	}
+	if  (HY < GY) {
+		if (pos(hazard,HX,HY+1)) {
+			X = HX + 1;
+			Y = HY + 1;
+		}
+		else {
+			Y = HY + 1;
+		}
+		unblock;
+		
+	}
+	elif (HY > GY) {
+		if (pos(hazard,HX,HY-1)) {
+			X = HX - 1;
+			Y = HY - 1;
+		}
+		else {
+			Y = HY - 1;
+		}
+		unblock;
+	}
+	if (not .ground(X)) {
+		X = HX;
+	}
+	if (not .ground(Y)) {
+		Y = HY;
+	}
+	move(X,Y);
 	.
 	
 	

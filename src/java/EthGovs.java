@@ -117,6 +117,8 @@ public class EthGovs extends Environment {
             } else if (action.equals(p12)) { //At human, human not in danger, proximity count > 3
                 safetyChoice = "12 1"; //Safety says Stay Put, with a score of 1
 				autonomyChoice = "22 3"; //Autonomy says Move Away, with a score of 3
+            } else if (action.getFunctor().equals("unblock")) {
+            	blocked = false;
             } else if (action.getFunctor().equals("move")) {
             	NumberTerm x = (NumberTerm) action.getTerm(0);
             	NumberTerm y = (NumberTerm) action.getTerm(1);
@@ -619,82 +621,16 @@ public class EthGovs extends Environment {
 			Location humanLoc = getAgPos(0);
 			humanLoc.x = x;
 			humanLoc.y = y;
-					if(((humanLoc.x == hazLoc1.x) && (humanLoc.y == hazLoc1.y)) ||
-					   ((humanLoc.x == hazLoc2.x) && (humanLoc.y == hazLoc2.y)) ||
-					   ((humanLoc.x == hazLoc3.x) && (humanLoc.y == hazLoc3.y)) ||
-					   ((humanLoc.x == hazLoc4.x) && (humanLoc.y == hazLoc4.y)) ||
-					   ((humanLoc.x == hazLoc5.x) && (humanLoc.y == hazLoc5.y))){
-						   logger.severe("HUMAN STEPPED ON HAZARD");
-					   }
-//					if (humanLoc.x < currentGoal.x) { //To test where he would normally go
-//						testingLoc = new Location(humanLoc.x+1, humanLoc.y);
-//						if(/*(!isInRadius(testingLoc, hazLoc1)) || //isInRadius returns true if the first argument is within 1 space of the second argument
-//						   (!isInRadius(testingLoc, hazLoc2)) || //This conditional checks to see if the intended location is in the radius of any hazards
-//						   (!isInRadius(testingLoc, hazLoc3)) ||
-//						   (!isInRadius(testingLoc, hazLoc4)) ||
-//						   (!isInRadius(testingLoc, hazLoc5))*/
-//						   ((testingLoc.x == hazLoc1.x) && (testingLoc.y == hazLoc1.y)) ||
-//						   ((testingLoc.x == hazLoc2.x) && (testingLoc.y == hazLoc2.y)) ||
-//						   ((testingLoc.x == hazLoc3.x) && (testingLoc.y == hazLoc3.y)) ||
-//						   ((testingLoc.x == hazLoc4.x) && (testingLoc.y == hazLoc4.y)) ||
-//						   ((testingLoc.x == hazLoc5.x) && (testingLoc.y == hazLoc5.y))){
-//							   humanLoc.x++; //If it isn't, then move there
-//							   humanLoc.y++;
-//							   blocked = false; //And human is no longer blocked
-//						   } else {
-//							   humanLoc.x++;
-//							   blocked = false;
-//						   }
-//						
-//					}
-//					if (humanLoc.x > currentGoal.x) {
-//						testingLoc = new Location(humanLoc.x-1, humanLoc.y);
-//						if(((testingLoc.x == hazLoc1.x) && (testingLoc.y == hazLoc1.y)) ||
-//						   ((testingLoc.x == hazLoc2.x) && (testingLoc.y == hazLoc2.y)) ||
-//						   ((testingLoc.x == hazLoc3.x) && (testingLoc.y == hazLoc3.y)) ||
-//						   ((testingLoc.x == hazLoc4.x) && (testingLoc.y == hazLoc4.y)) ||
-//						   ((testingLoc.x == hazLoc5.x) && (testingLoc.y == hazLoc5.y))){
-//							   humanLoc.x--;
-//							   humanLoc.y--;
-//							   blocked = false;
-//						   } else {
-//							   humanLoc.x--;
-//							   blocked = false;
-//						   }
-//					}
-//					if (humanLoc.y < currentGoal.y) {
-//						testingLoc = new Location(humanLoc.x, humanLoc.y+1);
-//						if(((testingLoc.x == hazLoc1.x) && (testingLoc.y == hazLoc1.y)) ||
-//						   ((testingLoc.x == hazLoc2.x) && (testingLoc.y == hazLoc2.y)) ||
-//						   ((testingLoc.x == hazLoc3.x) && (testingLoc.y == hazLoc3.y)) ||
-//						   ((testingLoc.x == hazLoc4.x) && (testingLoc.y == hazLoc4.y)) ||
-//						   ((testingLoc.x == hazLoc5.x) && (testingLoc.y == hazLoc5.y))){
-//							   humanLoc.y++;
-//							   humanLoc.x++;
-//							   blocked = false;
-//						   } else {
-//							   humanLoc.y++;
-//							   blocked = false;
-//						   }
-//					}
-//					if (humanLoc.y > currentGoal.y) {
-//						testingLoc = new Location(humanLoc.x, humanLoc.y-1);
-//						if(((testingLoc.x == hazLoc1.x) && (testingLoc.y == hazLoc1.y)) ||
-//						   ((testingLoc.x == hazLoc2.x) && (testingLoc.y == hazLoc2.y)) ||
-//						   ((testingLoc.x == hazLoc3.x) && (testingLoc.y == hazLoc3.y)) ||
-//						   ((testingLoc.x == hazLoc4.x) && (testingLoc.y == hazLoc4.y)) ||
-//						   ((testingLoc.x == hazLoc5.x) && (testingLoc.y == hazLoc5.y))){
-//							   humanLoc.y--;
-//							   humanLoc.x--;
-//							   blocked = false;
-//						   } else {
-//							   humanLoc.y--;
-//							   blocked = false;
-//						   }
-//					}
-				setAgPos(0,humanLoc);
-				//Formally change the humans location, and show in console where he moved to
-				System.out.println("Human moved to " + humanLoc.x + "," + humanLoc.y);
+			if(((humanLoc.x == hazLoc1.x) && (humanLoc.y == hazLoc1.y)) ||
+			   ((humanLoc.x == hazLoc2.x) && (humanLoc.y == hazLoc2.y)) ||
+			   ((humanLoc.x == hazLoc3.x) && (humanLoc.y == hazLoc3.y)) ||
+			   ((humanLoc.x == hazLoc4.x) && (humanLoc.y == hazLoc4.y)) ||
+			   ((humanLoc.x == hazLoc5.x) && (humanLoc.y == hazLoc5.y))){
+				   logger.severe("HUMAN STEPPED ON HAZARD");
+			}
+			setAgPos(0,humanLoc);
+			//Formally change the humans location, and show in console where he moved to
+			System.out.println("Human moved to " + humanLoc.x + "," + humanLoc.y);
 		}
 		
 		boolean isInRadius(Location input, Location target) { //This method is used to test if the input is 1 square away from the target
@@ -715,7 +651,12 @@ public class EthGovs extends Environment {
 
     class EGView extends GridWorldView {
 
-        public EGView(EGModel model) {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = -6292760541729112095L;
+
+		public EGView(EGModel model) {
             super(model, "Ethical Governor World", 600);  // Loads the gridworld with the current model as defined before, with window size 600
             defaultFont = new Font("Arial", Font.BOLD, 18); // change default font
             setVisible(true);
