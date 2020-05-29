@@ -14,6 +14,9 @@ near1(A,B) :-  pos(A,X,Y) & pos(B,X-1,Y) | //May be some logical errors with thi
 			   
 //+!act <- move.
 
++blocked(true) <- -blocked(false)[source(_)].
++blocked(false) <- -blocked(true)[source(_)].
+
 +!act : not achieving_goal(_,_) & goal_step(Gstep)
 <-
 	?goal(Gstep,X,Y);
@@ -52,4 +55,35 @@ near1(A,B) :-  pos(A,X,Y) & pos(B,X-1,Y) | //May be some logical errors with thi
 <-
 	!move(X,Y);
 	.
+	
++!move(GX,GY) : blocked(false) & pos(human,HX,HY)
+<-
+	if (HX < GX) {
+		X = HX + 1;
+	}
+	elif (HX > GX) {
+		X = HX - 1;
+	}
+	else {
+		X = HX;
+	}
+	if (HY < GY) {
+		Y = HY + 1;
+	}
+	elif (HY > GY) {
+		Y = HY - 1;
+	}
+	else {
+		Y = HY;
+	}
+	move(X,Y);
+	.
+	
++!move(GX,GY) : blocked(true) & pos(human,HX,HY)
+<-
+	.print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+//	move(X,Y);
+	.
+	
+	
 	

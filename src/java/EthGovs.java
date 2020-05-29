@@ -40,15 +40,10 @@ public class EthGovs extends Environment {
 	public String safetyChoice;
 	public String autonomyChoice;
 	
-	//public Location[] locs = new Location[loc1, loc2, loc3, loc4, loc5];
-	
 	public boolean blocked = false;
-	public boolean pickChoice = true;
-	public boolean active = true;
 	
 	public int proximityCount = 0;
 	public int currentGoalStep = 0;
-	public int humanTimer = 9;
 	
 	int randomWithRange(int min, int max)
     {
@@ -79,13 +74,13 @@ public class EthGovs extends Environment {
         model = new EGModel();
         view  = new EGView(model);
         model.setView(view);
-        updatePerceptsStart();
+        updatePercepts();
     } //This method is required at the start of every environment. This method becomes before anything else and prevented me from user input last year.
 
     @Override
     public boolean executeAction(String ag, Structure action) { //This is for picking up on any literals contained in the agents files
         try {
-			System.out.println("Proximity Score " + proximityCount);
+			
             if (action.equals(p1)) { //Not near/at human, human in Danger, proximity count < 3.
 				safetyChoice = "11 3"; //Safety says Move Towards human, with a score of 3
 				autonomyChoice = "21 1"; // Autonomy says Stay Put, with a score of 1
@@ -123,9 +118,12 @@ public class EthGovs extends Environment {
                 safetyChoice = "12 1"; //Safety says Stay Put, with a score of 1
 				autonomyChoice = "22 3"; //Autonomy says Move Away, with a score of 3
             } else if (action.getFunctor().equals("move")) {
-            	model.humanMove(); //Human can now move
+            	NumberTerm x = (NumberTerm) action.getTerm(0);
+            	NumberTerm y = (NumberTerm) action.getTerm(1);
+            	model.humanMove((int) x.solve(),(int) y.solve()); //Human can now move
             }
             if (action.getFunctor().equals("move") || action.getFunctor().equals("skip")) {
+            	System.out.println("Proximity Score " + proximityCount);
         		updatePercepts(); //Update percepts ready for the next reasoning cycle
                 try {
                     Thread.sleep(400); // wait o.2 seconds before next reasoning cycle
@@ -144,7 +142,7 @@ public class EthGovs extends Environment {
     }
     
     /** creates the agents perception based on the EGModel */
-    void updatePerceptsStart() { // Method for updating the agent's beliefs - Necessary method
+    void updatePercepts() { // Method for updating the agent's beliefs - Necessary method
         clearPercepts();
 
         Location humanLoc = model.getAgPos(0); // Locations of agents positions
@@ -171,6 +169,8 @@ public class EthGovs extends Environment {
 		Literal gloc4 = Literal.parseLiteral("goal(4," + loc4.x + "," + loc4.y + ")");
 		Literal gloc5 = Literal.parseLiteral("goal(5," + loc5.x + "," + loc5.y + ")");
 		
+		Literal block = Literal.parseLiteral("blocked(" + blocked + ")");
+		
 		Literal step = Literal.parseLiteral("new_step");
 		
 		// All percepts added
@@ -187,33 +187,8 @@ public class EthGovs extends Environment {
 		addPercept(gloc4);
 		addPercept(gloc5);
 		addPercept(proxCount);
-		addPercept(step);
-		
-		
-    }
-
-    /** creates the agents perception based on the EGModel */
-    void updatePercepts() { // Method for updating the agent's beliefs - Necessary method
-        clearPercepts();
-
-        Location humanLoc = model.getAgPos(0); // Locations of agents positions
-		Location robotLoc = model.getAgPos(1);
-		
-		// Positions of human, and robot, as percepts
-        Literal pos1 = Literal.parseLiteral("pos(human," + humanLoc.x + "," + humanLoc.y + ")"); // Belief for positions will be saved in this format
-		Literal pos2 = Literal.parseLiteral("pos(governors," + robotLoc.x + "," + robotLoc.y + ")");
-		
-		// Proximity Count as a percept
-		Literal proxCount = Literal.parseLiteral("proximityScore(" + proximityCount + ")");
-		
-		Literal step = Literal.parseLiteral("new_step");
-		
-		// All percepts added
-        addPercept(pos1);
-		addPercept(pos2);
-		addPercept(proxCount);
-		addPercept(step);
-		
+		addPercept("governors",step);
+		addPercept("human",block);
 		
     }
 	
@@ -393,6 +368,12 @@ public class EthGovs extends Environment {
 					blocked = true;
 					setAgPos(1,governors);
 					System.out.println("Robot is blocking human");
+					Literal block = Literal.parseLiteral("blocked(" + blocked + ")");
+					addPercept("human",block);
+	                try {
+	                    Thread.sleep(400); // wait o.2 seconds before next reasoning cycle
+	                } catch (Exception e) {}
+	                informAgsEnvironmentChanged();
 					break;
 
 				case 21:
@@ -634,53 +615,10 @@ public class EthGovs extends Environment {
 			}
 		}
 		
-		void humanMove() { // This will be the human's calculated movement based on the goal tiles
+		void humanMove(int x, int y) { // This will be the human's calculated movement based on the goal tiles
 			Location humanLoc = getAgPos(0);
-			if(active) { //The human is active while going towards his goal
-				if(pickChoice) { //Picks a choice while he doesnt have a goal to go to
-					switch(currentGoalStep) {
-						case 0:
-							currentGoalStep++; // So next time it picks the next goal
-							currentGoal = loc1; //Set to loc1. All locations are generated randomly, so this sequential manner doesn't matter in terms of random goals.
-							pickChoice=false;
-							break;
-						case 1:
-							currentGoalStep++;
-							currentGoal = loc2;
-							pickChoice=false;
-							break;
-						case 2:
-							currentGoalStep++;
-							currentGoal = loc3;
-							pickChoice=false;
-							break;
-						case 3:
-							currentGoalStep++;
-							currentGoal = loc4;
-							pickChoice=false;
-							break;
-						case 4:
-							currentGoalStep++;
-							currentGoal = loc5;
-							pickChoice=false;
-							break;
-						default:
-							break;
-					}
-				}
-				if(!blocked) { //This is for his normal movement, while hes not blocked
-					if (humanLoc.x < currentGoal.x) {
-						humanLoc.x++;
-					}
-					if (humanLoc.x > currentGoal.x) {
-						humanLoc.x--;
-					}
-					if (humanLoc.y < currentGoal.y) {
-						humanLoc.y++;
-					}
-					if (humanLoc.y > currentGoal.y) {
-						humanLoc.y--;
-					}
+			humanLoc.x = x;
+			humanLoc.y = y;
 					if(((humanLoc.x == hazLoc1.x) && (humanLoc.y == hazLoc1.y)) ||
 					   ((humanLoc.x == hazLoc2.x) && (humanLoc.y == hazLoc2.y)) ||
 					   ((humanLoc.x == hazLoc3.x) && (humanLoc.y == hazLoc3.y)) ||
@@ -688,95 +626,75 @@ public class EthGovs extends Environment {
 					   ((humanLoc.x == hazLoc5.x) && (humanLoc.y == hazLoc5.y))){
 						   logger.severe("HUMAN STEPPED ON HAZARD");
 					   }
-					if ((humanLoc.x == currentGoal.x) && (humanLoc.y == currentGoal.y)){
-						active = false; //Once he's reach the goal, set active to false ready for a break
-					}
-				} else {
-					if (humanLoc.x < currentGoal.x) { //To test where he would normally go
-						testingLoc = new Location(humanLoc.x+1, humanLoc.y);
-						if(/*(!isInRadius(testingLoc, hazLoc1)) || //isInRadius returns true if the first argument is within 1 space of the second argument
-						   (!isInRadius(testingLoc, hazLoc2)) || //This conditional checks to see if the intended location is in the radius of any hazards
-						   (!isInRadius(testingLoc, hazLoc3)) ||
-						   (!isInRadius(testingLoc, hazLoc4)) ||
-						   (!isInRadius(testingLoc, hazLoc5))*/
-						   ((testingLoc.x == hazLoc1.x) && (testingLoc.y == hazLoc1.y)) ||
-						   ((testingLoc.x == hazLoc2.x) && (testingLoc.y == hazLoc2.y)) ||
-						   ((testingLoc.x == hazLoc3.x) && (testingLoc.y == hazLoc3.y)) ||
-						   ((testingLoc.x == hazLoc4.x) && (testingLoc.y == hazLoc4.y)) ||
-						   ((testingLoc.x == hazLoc5.x) && (testingLoc.y == hazLoc5.y))){
-							   humanLoc.x++; //If it isn't, then move there
-							   humanLoc.y++;
-							   blocked = false; //And human is no longer blocked
-						   } else {
-							   humanLoc.x++;
-							   blocked = false;
-						   }
-						
-					}
-					if (humanLoc.x > currentGoal.x) {
-						testingLoc = new Location(humanLoc.x-1, humanLoc.y);
-						if(((testingLoc.x == hazLoc1.x) && (testingLoc.y == hazLoc1.y)) ||
-						   ((testingLoc.x == hazLoc2.x) && (testingLoc.y == hazLoc2.y)) ||
-						   ((testingLoc.x == hazLoc3.x) && (testingLoc.y == hazLoc3.y)) ||
-						   ((testingLoc.x == hazLoc4.x) && (testingLoc.y == hazLoc4.y)) ||
-						   ((testingLoc.x == hazLoc5.x) && (testingLoc.y == hazLoc5.y))){
-							   humanLoc.x--;
-							   humanLoc.y--;
-							   blocked = false;
-						   } else {
-							   humanLoc.x--;
-							   blocked = false;
-						   }
-					}
-					if (humanLoc.y < currentGoal.y) {
-						testingLoc = new Location(humanLoc.x, humanLoc.y+1);
-						if(((testingLoc.x == hazLoc1.x) && (testingLoc.y == hazLoc1.y)) ||
-						   ((testingLoc.x == hazLoc2.x) && (testingLoc.y == hazLoc2.y)) ||
-						   ((testingLoc.x == hazLoc3.x) && (testingLoc.y == hazLoc3.y)) ||
-						   ((testingLoc.x == hazLoc4.x) && (testingLoc.y == hazLoc4.y)) ||
-						   ((testingLoc.x == hazLoc5.x) && (testingLoc.y == hazLoc5.y))){
-							   humanLoc.y++;
-							   humanLoc.x++;
-							   blocked = false;
-						   } else {
-							   humanLoc.y++;
-							   blocked = false;
-						   }
-					}
-					if (humanLoc.y > currentGoal.y) {
-						testingLoc = new Location(humanLoc.x, humanLoc.y-1);
-						if(((testingLoc.x == hazLoc1.x) && (testingLoc.y == hazLoc1.y)) ||
-						   ((testingLoc.x == hazLoc2.x) && (testingLoc.y == hazLoc2.y)) ||
-						   ((testingLoc.x == hazLoc3.x) && (testingLoc.y == hazLoc3.y)) ||
-						   ((testingLoc.x == hazLoc4.x) && (testingLoc.y == hazLoc4.y)) ||
-						   ((testingLoc.x == hazLoc5.x) && (testingLoc.y == hazLoc5.y))){
-							   humanLoc.y--;
-							   humanLoc.x--;
-							   blocked = false;
-						   } else {
-							   humanLoc.y--;
-							   blocked = false;
-						   }
-					}
-					if ((humanLoc.x == currentGoal.x) && (humanLoc.y == currentGoal.y)){
-						active = false;
-					}
-				}
+//					if (humanLoc.x < currentGoal.x) { //To test where he would normally go
+//						testingLoc = new Location(humanLoc.x+1, humanLoc.y);
+//						if(/*(!isInRadius(testingLoc, hazLoc1)) || //isInRadius returns true if the first argument is within 1 space of the second argument
+//						   (!isInRadius(testingLoc, hazLoc2)) || //This conditional checks to see if the intended location is in the radius of any hazards
+//						   (!isInRadius(testingLoc, hazLoc3)) ||
+//						   (!isInRadius(testingLoc, hazLoc4)) ||
+//						   (!isInRadius(testingLoc, hazLoc5))*/
+//						   ((testingLoc.x == hazLoc1.x) && (testingLoc.y == hazLoc1.y)) ||
+//						   ((testingLoc.x == hazLoc2.x) && (testingLoc.y == hazLoc2.y)) ||
+//						   ((testingLoc.x == hazLoc3.x) && (testingLoc.y == hazLoc3.y)) ||
+//						   ((testingLoc.x == hazLoc4.x) && (testingLoc.y == hazLoc4.y)) ||
+//						   ((testingLoc.x == hazLoc5.x) && (testingLoc.y == hazLoc5.y))){
+//							   humanLoc.x++; //If it isn't, then move there
+//							   humanLoc.y++;
+//							   blocked = false; //And human is no longer blocked
+//						   } else {
+//							   humanLoc.x++;
+//							   blocked = false;
+//						   }
+//						
+//					}
+//					if (humanLoc.x > currentGoal.x) {
+//						testingLoc = new Location(humanLoc.x-1, humanLoc.y);
+//						if(((testingLoc.x == hazLoc1.x) && (testingLoc.y == hazLoc1.y)) ||
+//						   ((testingLoc.x == hazLoc2.x) && (testingLoc.y == hazLoc2.y)) ||
+//						   ((testingLoc.x == hazLoc3.x) && (testingLoc.y == hazLoc3.y)) ||
+//						   ((testingLoc.x == hazLoc4.x) && (testingLoc.y == hazLoc4.y)) ||
+//						   ((testingLoc.x == hazLoc5.x) && (testingLoc.y == hazLoc5.y))){
+//							   humanLoc.x--;
+//							   humanLoc.y--;
+//							   blocked = false;
+//						   } else {
+//							   humanLoc.x--;
+//							   blocked = false;
+//						   }
+//					}
+//					if (humanLoc.y < currentGoal.y) {
+//						testingLoc = new Location(humanLoc.x, humanLoc.y+1);
+//						if(((testingLoc.x == hazLoc1.x) && (testingLoc.y == hazLoc1.y)) ||
+//						   ((testingLoc.x == hazLoc2.x) && (testingLoc.y == hazLoc2.y)) ||
+//						   ((testingLoc.x == hazLoc3.x) && (testingLoc.y == hazLoc3.y)) ||
+//						   ((testingLoc.x == hazLoc4.x) && (testingLoc.y == hazLoc4.y)) ||
+//						   ((testingLoc.x == hazLoc5.x) && (testingLoc.y == hazLoc5.y))){
+//							   humanLoc.y++;
+//							   humanLoc.x++;
+//							   blocked = false;
+//						   } else {
+//							   humanLoc.y++;
+//							   blocked = false;
+//						   }
+//					}
+//					if (humanLoc.y > currentGoal.y) {
+//						testingLoc = new Location(humanLoc.x, humanLoc.y-1);
+//						if(((testingLoc.x == hazLoc1.x) && (testingLoc.y == hazLoc1.y)) ||
+//						   ((testingLoc.x == hazLoc2.x) && (testingLoc.y == hazLoc2.y)) ||
+//						   ((testingLoc.x == hazLoc3.x) && (testingLoc.y == hazLoc3.y)) ||
+//						   ((testingLoc.x == hazLoc4.x) && (testingLoc.y == hazLoc4.y)) ||
+//						   ((testingLoc.x == hazLoc5.x) && (testingLoc.y == hazLoc5.y))){
+//							   humanLoc.y--;
+//							   humanLoc.x--;
+//							   blocked = false;
+//						   } else {
+//							   humanLoc.y--;
+//							   blocked = false;
+//						   }
+//					}
 				setAgPos(0,humanLoc);
 				//Formally change the humans location, and show in console where he moved to
 				System.out.println("Human moved to " + humanLoc.x + "," + humanLoc.y);
-			}
-			if(!active) { 
-				humanTimer--; //When no longer active, i.e. reached goal, decrement the cooldown timer each iteration
-				if(humanTimer == 0) { 
-					active = true; // When the timer reaches zero, human becomes active again
-					pickChoice = true; //Allows him to pick another choice
-					humanTimer = 9; //Timer set back to 9, ready for the next time
-					if(currentGoalStep == 5) { //This simply sets the human on and endless loop, so that the simulation doesnt reach a definitive end
-						currentGoalStep = 0;
-					}
-				}
-			}
 		}
 		
 		boolean isInRadius(Location input, Location target) { //This method is used to test if the input is 1 square away from the target
