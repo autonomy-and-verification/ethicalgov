@@ -1,4 +1,4 @@
-at(P) :- pos(P,X,Y) & pos(governors,X,Y). // at(P) means for position (P,X,Y) and the robot is at that position
+at(P) :- pos(P,X,Y) & pos(robot,X,Y). // at(P) means for position (P,X,Y) and the robot is at that position
 near1(A,B) :-  pos(A,X,Y) & pos(B,X-1,Y) | //May be some logical errors with this initial setof beliefs - find out during testing
 			   pos(A,X,Y) & pos(B,X-1,Y-1) |
 			   pos(A,X,Y) & pos(B,X,Y-1) |
@@ -18,84 +18,121 @@ annoyed :- proximityScore(A) & A > 3.
 //Agent's plans
 +new_step 
 <- 
+	.print("NEW STEP!!!!!!!!!!!!");
 	-new_step[source(_)];
  	!checkOnHuman(human);
  	.
  	
-+!human_step
++!robot_step
 <- 
-	.send(human, achieve, act);
+	.send(robot, achieve, act);
 	.
 
 
 +!checkOnHuman(human) : inDanger2(human) & not at(human) & not near1(human) & not annoyed
 <- 
 	plan1;
-	!human_step;
+	?choice(C);
+	-choice(C)[source(_)];
+	.send(robot,tell,choice(C));
+//	!robot_step;
 	.
 		   
 +!checkOnHuman(human) : inDanger2(human) & not at(human) & not near1(human) & annoyed
 <- 
 	plan2;
-	!human_step;
+	?choice(C);
+	-choice(C)[source(_)];
+	.send(robot,tell,choice(C));
+//	!robot_step;
 	.
 		   
 +!checkOnHuman(human) : not inDanger2(human) & not at(human) & not near1(human) & not annoyed
 <- 
 	plan3;
-	!human_step;
+	?choice(C);
+	-choice(C)[source(_)];
+	.send(robot,tell,choice(C));
+//	!robot_step;
 	.
 		   
 +!checkOnHuman(human) : not inDanger2(human) & not at(human) & not near1(human) & annoyed
 <- 
 	plan4;
-	!human_step;
+	?choice(C);
+	-choice(C)[source(_)];
+	.send(robot,tell,choice(C));
+//	!robot_step;
 	.
 		   
 +!checkOnHuman(human) : inDanger2(human) & not at(human) & near1(human) & not annoyed
 <- 
 	plan5;
-	!human_step;
+	?choice(C);
+	-choice(C)[source(_)];
+	.send(robot,tell,choice(C));
+//	!robot_step;
 	.
 		   
 +!checkOnHuman(human) : inDanger2(human) & not at(human) & near1(human) & annoyed
 <- 
 	plan6;
-	!human_step;
+	?choice(C);
+	-choice(C)[source(_)];
+	.send(robot,tell,choice(C));
+//	!robot_step;
 	.
 		   
 +!checkOnHuman(human) : not inDanger2(human) & not at(human) & near1(human) & not annoyed
 <- 
 	plan7;
-	!human_step;
+	?choice(C);
+	-choice(C)[source(_)];
+	.send(robot,tell,choice(C));
+//	!robot_step;
 	.
 		   
 +!checkOnHuman(human) : not inDanger2(human) & not at(human) & near1(human) & annoyed
 <- 
 	plan8;
-	!human_step;
+	?choice(C);
+	-choice(C)[source(_)];
+	.send(robot,tell,choice(C));
+//	!robot_step;
 	.
 		   
 +!checkOnHuman(human) : inDanger2(human) & at(human) & not annoyed
 <- 
 	plan9;
-	!human_step;
+	?choice(C);
+	-choice(C)[source(_)];
+	.send(robot,tell,choice(C));
+//	!robot_step;
 	.
 		 
 +!checkOnHuman(human) : inDanger2(human) & at(human) & annoyed
 <- 
 	plan10;
-	!human_step;
+	?choice(C);
+	-choice(C)[source(_)];
+	.send(robot,tell,choice(C));
+//	!robot_step;
 	.
 		
 +!checkOnHuman(human) : not inDanger2(human) & at(human) & not annoyed
 <- 
 	plan11;
-	!human_step;
+	?choice(C);
+	-choice(C)[source(_)];
+	.send(robot,tell,choice(C));
+//	!robot_step;
 	.
 		   
 +!checkOnHuman(human) : not inDanger2(human) & at(human) & annoyed
 <- 
 	plan12;
-	!human_step;
+	?choice(C);
+	-choice(C)[source(_)];
+	.send(robot,tell,choice(C));
+//	!robot_step;
 	.

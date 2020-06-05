@@ -43,7 +43,6 @@ public class EthGovs extends Environment {
 	public boolean blocked = false;
 	
 	public int proximityCount = 0;
-	public int currentGoalStep = 0;
 	
 	int randomWithRange(int min, int max)
     {
@@ -65,9 +64,7 @@ public class EthGovs extends Environment {
 	public Location loc4 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
 	public Location loc5 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
 	
-	public Location currentGoal;
 	public Location testingLoc;
-	public Location robotsNextMove;
 
     @Override
     public void init(String[] args) {
@@ -117,14 +114,23 @@ public class EthGovs extends Environment {
             } else if (action.equals(p12)) { //At human, human not in danger, proximity count > 3
                 safetyChoice = "12 1"; //Safety says Stay Put, with a score of 1
 				autonomyChoice = "22 3"; //Autonomy says Move Away, with a score of 3
-            } else if (action.getFunctor().equals("unblock")) {
+            } else if (ag.contentEquals("human") && action.getFunctor().equals("unblock")) {
             	blocked = false;
-            } else if (action.getFunctor().equals("move")) {
+            } else if (ag.contentEquals("human") && action.getFunctor().equals("move")) {
             	NumberTerm x = (NumberTerm) action.getTerm(0);
             	NumberTerm y = (NumberTerm) action.getTerm(1);
             	model.humanMove((int) x.solve(),(int) y.solve()); //Human can now move
+            } else if (ag.contentEquals("robot") && action.getFunctor().equals("move")) {
+            	NumberTerm x = (NumberTerm) action.getTerm(0);
+            	NumberTerm y = (NumberTerm) action.getTerm(1);
+            	model.robotMove((int) x.solve(),(int) y.solve()); //Human can now move
+            } else if (ag.contentEquals("robot") && action.getFunctor().equals("block")) {
+            	model.robotBlock();
             }
-            if (action.getFunctor().equals("move") || action.getFunctor().equals("skip")) {
+            
+            
+            
+            if (ag.contentEquals("human") && (action.getFunctor().equals("move") || action.getFunctor().equals("skip"))) {
             	System.out.println("Proximity Score " + proximityCount);
         		updatePercepts(); //Update percepts ready for the next reasoning cycle
                 try {
@@ -152,7 +158,7 @@ public class EthGovs extends Environment {
 		
 		// Positions of human, and robot, as percepts
         Literal pos1 = Literal.parseLiteral("pos(human," + humanLoc.x + "," + humanLoc.y + ")"); // Belief for positions will be saved in this format
-		Literal pos2 = Literal.parseLiteral("pos(governors," + robotLoc.x + "," + robotLoc.y + ")");
+		Literal pos2 = Literal.parseLiteral("pos(robot," + robotLoc.x + "," + robotLoc.y + ")");
 		
 		// Proximity Count as a percept
 		Literal proxCount = Literal.parseLiteral("proximityScore(" + proximityCount + ")");
@@ -174,6 +180,8 @@ public class EthGovs extends Environment {
 		Literal block = Literal.parseLiteral("blocked(" + blocked + ")");
 		
 		Literal step = Literal.parseLiteral("new_step");
+		
+		logger.info("@@@@ New step @@@@");
 		
 		// All percepts added
         addPercept(pos1);
@@ -324,74 +332,47 @@ public class EthGovs extends Environment {
 				logger.info("Arbiter chose autonomy's proposal");
 			}
 			
-			try {
-				robotMove(choice); // Now we have a choice, we can make the robot move (or not) based on the action chosen by the arbiter method
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			
+			Literal ch = Literal.parseLiteral("choice(" + choice + ")");
+			addPercept("governors",ch);
+            informAgsEnvironmentChanged();
+            
+            logger.info("Adding choice "+ch);
+			
+//			try {
+//				robotMove(choice); // Now we have a choice, we can make the robot move (or not) based on the action chosen by the arbiter method
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
 		}
 		
-		void robotMove(int choice) throws Exception {
+		void robotBlock() {
+			Location robotLoc = getAgPos(1);
+			blocked = true;
+			setAgPos(1,robotLoc);
+			System.out.println("Robot is blocking human");
+			Literal block = Literal.parseLiteral("blocked(" + blocked + ")");
+			addPercept("human",block);
+            informAgsEnvironmentChanged();
+		}
+		
+		void robotMove(int x, int y) throws Exception {
 			
-			Location governors = getAgPos(1);
-			Location human = getAgPos(0);
+			Location robotLoc = getAgPos(1);
 			
-			switch(choice) {
-				
-				case 11:
-					//For moveTowards
-					if (governors.x < human.x) {
-						governors.x++;
-					}
-					if (governors.x > human.x) {
-						governors.x--;
-					}
-					if (governors.y < human.y) {
-						governors.y++;
-					}
-					if (governors.y > human.y) {
-						governors.y--;
-					}
-
-					// Set the robots position to whatever the x and y values were changed to
-					setAgPos(1,governors);
-					System.out.println("Robot moved to " + governors.x + "," + governors.y); //Show in the console where the robot moved to
-					break;
-					
-				case 12: 
-					//Code block for staying put
-					//Do nothing
-					setAgPos(1,governors);
-					System.out.println("Robot stayed at " + governors.x + "," + governors.y);
-					break;
-				
-				case 13:
-					//Code block for preventing
-					blocked = true;
-					setAgPos(1,governors);
-					System.out.println("Robot is blocking human");
-					Literal block = Literal.parseLiteral("blocked(" + blocked + ")");
-					addPercept("human",block);
-	                try {
-	                    Thread.sleep(400); // wait o.2 seconds before next reasoning cycle
-	                } catch (Exception e) {}
-	                informAgsEnvironmentChanged();
-					break;
-
-				case 21:
-					//Code block for staying put again
-					setAgPos(1,governors);
-					System.out.println("Robot stayed at " + governors.x + "," + governors.y);
-					break;
-					
-				case 22:
-					//Code block for moveAway
-					//Need to design so the robot moves to the next available square that isn't in range of the human
-					moveAwayFromHuman(governors, human);
-					break;
-				default:
-					break;
+			if (robotLoc.x == x && robotLoc.y == y) {
+				System.out.println("Robot stayed at " + robotLoc.x + "," + robotLoc.y);
 			}
+			else {
+				System.out.println("Robot moved to " + robotLoc.x + "," + robotLoc.y); //Show in the console where the robot moved to
+			}
+			
+			robotLoc.x = x;
+			robotLoc.y = y;
+			
+			// Set the robots position to whatever the x and y values were changed to
+			setAgPos(1,robotLoc);
+
         }
 		
 		void moveAwayFromHuman(Location governors, Location human) {
