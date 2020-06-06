@@ -1,5 +1,3 @@
-// THE ROBOT
-
 +!human_step
 <- 
 	.send(human, achieve, act);
@@ -29,6 +27,7 @@
 	.print("Choice 13");
 	-choice(_)[source(_)];
 	block;
+	.send(human,tell,blocked);
 	!human_step;
 	.
 

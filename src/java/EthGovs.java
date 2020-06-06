@@ -17,32 +17,12 @@ public class EthGovs extends Environment {
     public static final int GOAL  = 16; // code in grid model
 	public static final int HAZARD = 8; // code in grid model
 
-    //AGENT LITERALS
-	//The explanations of these plans may be seen in the executeAction() method
-	public static final Term    p1  = Literal.parseLiteral("plan1");
-	public static final Term    p2  = Literal.parseLiteral("plan2");
-	public static final Term    p3  = Literal.parseLiteral("plan3");
-	public static final Term    p4  = Literal.parseLiteral("plan4");
-	public static final Term    p5  = Literal.parseLiteral("plan5");
-	public static final Term    p6  = Literal.parseLiteral("plan6");
-	public static final Term    p7  = Literal.parseLiteral("plan7");
-	public static final Term    p8  = Literal.parseLiteral("plan8");
-	public static final Term    p9  = Literal.parseLiteral("plan9");
-	public static final Term    p10 = Literal.parseLiteral("plan10");
-	public static final Term    p11 = Literal.parseLiteral("plan11");
-	public static final Term    p12 = Literal.parseLiteral("plan12");
-	
     static Logger logger = Logger.getLogger(EthGovs.class.getName()); // We can use this as output for our simulation
 
     private EGModel model; // In my project last year I had this as a separate file. Here the model is contained in the environment
     private EGView  view;
 	
-	public String safetyChoice;
-	public String autonomyChoice;
-	
 	public boolean blocked = false;
-	
-	public int proximityCount = 0;
 	
 	int randomWithRange(int min, int max)
     {
@@ -63,8 +43,6 @@ public class EthGovs extends Environment {
 	public Location loc3 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
 	public Location loc4 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
 	public Location loc5 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
-	
-	public Location testingLoc;
 
     @Override
     public void init(String[] args) {
@@ -78,43 +56,7 @@ public class EthGovs extends Environment {
     public boolean executeAction(String ag, Structure action) { //This is for picking up on any literals contained in the agents files
         try {
 			
-            if (action.equals(p1)) { //Not near/at human, human in Danger, proximity count < 3.
-				safetyChoice = "11 3"; //Safety says Move Towards human, with a score of 3
-				autonomyChoice = "21 1"; // Autonomy says Stay Put, with a score of 1
-            } else if (action.equals(p2)) { //Not near/at human, human in danger, proximity count > 3
-				safetyChoice = "11 3"; //Safety says Move Towards human, with a score of 3
-				autonomyChoice = "21 3"; //Autonomy says Stay Put, with a score of 2
-            } else if (action.equals(p3)) { //Not near/at human, human not in danger, proximity count < 3.
-				safetyChoice = "11 2"; //Safety says Move Towards human, with a score of 2
-				autonomyChoice = "21 1"; //Autonomy says Stay Put, with a score of 2
-            } else if (action.equals(p4)) { //Not near/at human, human not in danger, proximity count > 3.
-				safetyChoice = "11 1"; //Safety says Move Towards human with a score 1
-				autonomyChoice = "21 3"; //Autonomy says Stay Put, with a score of 3
-            } else if (action.equals(p5)) { //Near human, human in danger, proximity count < 3
-                safetyChoice = "11 3"; //Safety says Move Towards human with a score of 3
-				autonomyChoice = "22 1"; //Autonomy says Move Away with a score of 1
-            } else if (action.equals(p6)) { //Near human, human in danger, proximity count > 3
-                safetyChoice = "11 3"; //Safety says Move Towards, with a score of 3
-				autonomyChoice = "22 3"; //Autonomy says Move Away, with a score of 3
-            } else if (action.equals(p7)) { //Near human, human not in danger, proximity count < 3
-                safetyChoice = "12 2"; // Safety says Stay Put, with a score of 2
-				autonomyChoice = "22 2"; //Autonomy says Move Away, with a score of 2
-            } else if (action.equals(p8)) { //Near human, human not in danger, proximity count > 3
-                safetyChoice = "12 2"; //Safety says Stay Put, with a score of 2
-				autonomyChoice = "22 3"; //Autonomy says Move Away, with a score of 3
-            } else if (action.equals(p9)) { //At human, human in danger, proximity count < 3
-                safetyChoice = "13 3"; //Safety says prevent human, with a score of 3
-				autonomyChoice = "22 1"; //Autonomy says Move Away, with a score of 1
-            } else if (action.equals(p10)) { //At human, human in danger, proximity count > 3
-                safetyChoice = "13 3"; //Safety says prevent human, with a score of 3
-				autonomyChoice = "22 2"; //Autonomy says Move Away, with a score of 3
-            } else if (action.equals(p11)) { //At human, human not in danger, proximity count < 3
-                safetyChoice = "12 1"; //Safety says Stay Put, with a score of 1
-				autonomyChoice = "22 2"; //Autonomy says Move Away, with a score of 2
-            } else if (action.equals(p12)) { //At human, human not in danger, proximity count > 3
-                safetyChoice = "12 1"; //Safety says Stay Put, with a score of 1
-				autonomyChoice = "22 3"; //Autonomy says Move Away, with a score of 3
-            } else if (ag.contentEquals("human") && action.getFunctor().equals("unblock")) {
+            if (ag.contentEquals("human") && action.getFunctor().equals("unblock")) {
             	blocked = false;
             } else if (ag.contentEquals("human") && action.getFunctor().equals("move")) {
             	NumberTerm x = (NumberTerm) action.getTerm(0);
@@ -128,20 +70,13 @@ public class EthGovs extends Environment {
             	model.robotBlock();
             }
             
-            
-            
             if (ag.contentEquals("human") && (action.getFunctor().equals("move") || action.getFunctor().equals("skip"))) {
-            	System.out.println("Proximity Score " + proximityCount);
         		updatePercepts(); //Update percepts ready for the next reasoning cycle
                 try {
                     Thread.sleep(400); // wait o.2 seconds before next reasoning cycle
                 } catch (Exception e) {}
                 informAgsEnvironmentChanged();
             }
-			if(ag.contentEquals("governors") && safetyChoice != null && autonomyChoice != null){ //Once both choices have been made
-				logger.info(ag + " Chose " + action); //Show in the log file what plan the governors agent chose
-				model.arbiterChoice();
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -160,9 +95,6 @@ public class EthGovs extends Environment {
         Literal pos1 = Literal.parseLiteral("pos(human," + humanLoc.x + "," + humanLoc.y + ")"); // Belief for positions will be saved in this format
 		Literal pos2 = Literal.parseLiteral("pos(robot," + robotLoc.x + "," + robotLoc.y + ")");
 		
-		// Proximity Count as a percept
-		Literal proxCount = Literal.parseLiteral("proximityScore(" + proximityCount + ")");
-		
 		// Locations of hazards as percepts
 		Literal haz1 = Literal.parseLiteral("pos(hazard," + hazLoc1.x + "," + hazLoc1.y + ")");
 		Literal haz2 = Literal.parseLiteral("pos(hazard," + hazLoc2.x + "," + hazLoc2.y + ")");
@@ -176,8 +108,6 @@ public class EthGovs extends Environment {
 		Literal gloc3 = Literal.parseLiteral("goal(3," + loc3.x + "," + loc3.y + ")");
 		Literal gloc4 = Literal.parseLiteral("goal(4," + loc4.x + "," + loc4.y + ")");
 		Literal gloc5 = Literal.parseLiteral("goal(5," + loc5.x + "," + loc5.y + ")");
-		
-		Literal block = Literal.parseLiteral("blocked(" + blocked + ")");
 		
 		Literal step = Literal.parseLiteral("new_step");
 		
@@ -196,9 +126,8 @@ public class EthGovs extends Environment {
 		addPercept(gloc3);
 		addPercept(gloc4);
 		addPercept(gloc5);
-		addPercept(proxCount);
-		addPercept("governors",step);
-		addPercept("human",block);
+		addPercept("safetygov",step);
+		addPercept("autonomygov",step);
 		
     }
 	
@@ -234,126 +163,12 @@ public class EthGovs extends Environment {
             add(HAZARD, hazLoc5);
         }
 		
-		void arbiterChoice()  {
-	
-			//Submethod for working out safetys score
-			Location robotLoc = getAgPos(1);
-			Location humanLoc = getAgPos(0);
-			if((robotLoc.x == humanLoc.x && robotLoc.y == humanLoc.y) || //This conditional sees if the robot is near the human
-				(robotLoc.x == humanLoc.x - 1 && robotLoc.y == humanLoc.y + 1) ||
-				(robotLoc.x == humanLoc.x && robotLoc.y == humanLoc.y + 1) ||
-				(robotLoc.x == humanLoc.x + 1 && robotLoc.y == humanLoc.y + 1) ||
-				(robotLoc.x == humanLoc.x - 1 && robotLoc.y == humanLoc.y) ||
-				(robotLoc.x == humanLoc.x + 1 && robotLoc.y == humanLoc.y) ||
-				(robotLoc.x == humanLoc.x - 1 && robotLoc.y == humanLoc.y - 1) ||
-				(robotLoc.x == humanLoc.x && robotLoc.y == humanLoc.y - 1) ||
-				(robotLoc.x == humanLoc.x + 1 && robotLoc.y == humanLoc.y - 1)) {
-					proximityCount++; //If so, increase the proximity score by 1
-				} else {
-					if(proximityCount > 0){
-						proximityCount--; //Otherwise, decrease the score
-					}
-				}
-			
-			String[] safetySplit = safetyChoice.split(" "); //Split safety's choice, so we get an ID for the action, as well as a score
-			int safetyAction = Integer.parseInt(safetySplit[0]); //And the ID is stored here
-			switch (safetyAction) { //We look to see which action was chosen
-				case 11:
-					logger.info("Safety submitted moveToward"); //And log which action was submitted
-					break;
-				case 12:
-					logger.info("Safety submitted stayPutS");
-					break;
-				case 13:
-					logger.info("Safety submitted prevent");
-					break;
-				default:
-					break;
-			}
-			Double safetyValue = new Double(Integer.parseInt(safetySplit[1])); // And the score is stored here, as a double, so calculations can be carried out
-			
-			String[] autonomySplit = autonomyChoice.split(" "); // From here...
-			int autonomyAction = Integer.parseInt(autonomySplit[0]);
-			switch (autonomyAction) {
-				case 21:
-					logger.info("Autonomy submitted stayPutA");
-					break;
-				case 22:
-					logger.info("Autonomy submitted moveAway");
-					break;
-				default:
-					break;
-			}
-			Double autonomyValue = new Double(Integer.parseInt(autonomySplit[1])); //...To here, the structure is the same as the previous block of code for the safety governor
-			
-			boolean protectiveGear = false;
-			boolean knowledgeOfHazard = true;
-			boolean permission = false; //These three booleans can be changed by whoever is inspecting the code.
-										//Depending on their true/false values, the governors scores will be modified, as seen below
-			int choice;
-			
-			if (protectiveGear & knowledgeOfHazard & permission) {
-				autonomyValue = autonomyValue * 1.6;
-			} else if (protectiveGear & permission) {
-				autonomyValue = autonomyValue * 1.4;
-				safetyValue = safetyValue * 1.2;
-			} else if (protectiveGear & knowledgeOfHazard) {
-				autonomyValue = autonomyValue * 1.4;
-				safetyValue = safetyValue * 1.2;
-			} else if (permission & knowledgeOfHazard) {
-				autonomyValue = autonomyValue * 1.4;
-				safetyValue = safetyValue * 1.2;
-			} else if (protectiveGear) {
-				autonomyValue = autonomyValue * 1.2;
-				safetyValue = safetyValue * 1.4;
-			} else if (permission) {
-				autonomyValue = autonomyValue * 1.2;
-				safetyValue = safetyValue * 1.4;
-			} else if (knowledgeOfHazard) {
-				autonomyValue = autonomyValue * 1.2;
-				safetyValue = safetyValue * 1.4;
-			} else {
-				safetyValue = safetyValue * 1.6;
-			}
-			
-			double customAutonomyMultiplier = 1;
-			double customSafetyMultiplier = 1;
-			
-			safetyValue = safetyValue * customSafetyMultiplier;
-			autonomyValue = autonomyValue * customAutonomyMultiplier;
-			
-			// At this point we should have values for autonomy and safety, so now we just choose the highest value:
-			
-			if (safetyValue > autonomyValue) {
-				choice = safetyAction;
-				logger.info("Arbiter chose safety's proposal");
-			} else {
-				choice = autonomyAction;
-				logger.info("Arbiter chose autonomy's proposal");
-			}
-			
-			
-			Literal ch = Literal.parseLiteral("choice(" + choice + ")");
-			addPercept("governors",ch);
-            informAgsEnvironmentChanged();
-            
-            logger.info("Adding choice "+ch);
-			
-//			try {
-//				robotMove(choice); // Now we have a choice, we can make the robot move (or not) based on the action chosen by the arbiter method
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-		}
 		
 		void robotBlock() {
 			Location robotLoc = getAgPos(1);
 			blocked = true;
 			setAgPos(1,robotLoc);
 			System.out.println("Robot is blocking human");
-			Literal block = Literal.parseLiteral("blocked(" + blocked + ")");
-			addPercept("human",block);
-            informAgsEnvironmentChanged();
 		}
 		
 		void robotMove(int x, int y) throws Exception {

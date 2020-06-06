@@ -1,14 +1,8 @@
-// THE HUMAN
-
 goal_step(1).
-			   
-//+!act <- move.
-
-+blocked(true) <- -blocked(false)[source(_)].
-+blocked(false) <- -blocked(true)[source(_)].
 
 +!act : not achieving_goal(_,_) & goal_step(Gstep)
 <-
+	.print("I am acting now");
 	?goal(Gstep,X,Y);
 	+achieving_goal(X,Y);
 	!move(X,Y);
@@ -16,6 +10,7 @@ goal_step(1).
 	
 +!act : timer(0) & goal_step(Gstep)
 <-
+	.print("I am acting now");
 	-timer(0);
 	-achieving_goal(_,_);
 	-goal_step(Gstep);
@@ -30,6 +25,7 @@ goal_step(1).
 	
 +!act : timer(T)
 <-
+	.print("I am acting now");
 	-timer(T);
 	+timer(T-1);
 	skip;
@@ -37,64 +33,82 @@ goal_step(1).
 	
 +!act : achieving_goal(X,Y) & pos(human,X,Y)
 <-
+	.print("I am acting now");
 	+timer(9);
 	skip;
 	.
 	
 +!act : achieving_goal(X,Y)
 <-
+	.print("I am acting now");
 	!move(X,Y);
 	.
 	
-+!move(GX,GY) : blocked(true) & pos(human,HX,HY)
++!move(GX,GY) : blocked & pos(human,HX,HY)
 <-
+	+x(HX);
+	+y(HY);
 	if (HX < GX) {
 		if (pos(hazard,HX+1,HY)) {
-			X = HX + 1;
-			Y = HY + 1;
+			-x(HX);
+			-y(HY);
+			+x(HX + 1);
+			+y(HY + 1);
 		}
 		else {
-			X = HX + 1;
+			-x(HX);
+			+x(HX + 1);
 		}
-		unblock;
 	}
 	elif (HX > GX) {
 		if (pos(hazard,HX-1,HY)) {
-			X = HX - 1;
-			Y = HY - 1;
+			-x(HX);
+			-y(HY);
+			+x(HX - 1);
+			+y(HY - 1);
 		}
 		else {
-			X = HX - 1;
+			-x(HX);
+			+x(HX - 1);
 		}
-		unblock;
 	}
+	?x(HX2);
+	?y(HY2);
 	if  (HY < GY) {
 		if (pos(hazard,HX,HY+1)) {
-			X = HX + 1;
-			Y = HY + 1;
+			-x(HX2);
+			-y(HY2);
+			+x(HX2 + 1);
+			+y(HY2 + 1);
 		}
 		else {
-			Y = HY + 1;
+			-y(HY2);
+			+y(HY2 + 1);
 		}
-		unblock;
-		
 	}
 	elif (HY > GY) {
 		if (pos(hazard,HX,HY-1)) {
-			X = HX - 1;
-			Y = HY - 1;
+			-x(HX2);
+			-y(HY2);
+			+x(HX2 - 1);
+			+y(HY2 - 1);
 		}
 		else {
-			Y = HY - 1;
+			-y(HY2);
+			+y(HY2 - 1);
 		}
+	}
+	
+	?x(X);
+	?y(Y);
+	-x(X);
+	-y(Y);
+	
+	if (not (X == HX & Y == HY)) {
+		-blocked[source(_)];
 		unblock;
 	}
-	if (not .ground(X)) {
-		X = HX;
-	}
-	if (not .ground(Y)) {
-		Y = HY;
-	}
+	
 	move(X,Y);
 	.
 	
