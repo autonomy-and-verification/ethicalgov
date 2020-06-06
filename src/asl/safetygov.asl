@@ -20,7 +20,6 @@ proximityScore(0).
 //Agent's plans
 +new_step 
 <- 
-	.print("NEW STEP!!!!!!!!!!!!");
 	-new_step[source(_)];
  	!checkOnHuman(human);
  	-proximityScore(_)[source(_)];

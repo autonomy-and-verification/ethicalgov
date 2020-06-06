@@ -6,7 +6,6 @@ MAS egsim {
     environment: EthGovs
 
     agents: human; 
-//    governors;
     robot;
     safetygov;
     autonomygov;

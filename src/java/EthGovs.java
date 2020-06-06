@@ -66,6 +66,8 @@ public class EthGovs extends Environment {
             	NumberTerm x = (NumberTerm) action.getTerm(0);
             	NumberTerm y = (NumberTerm) action.getTerm(1);
             	model.robotMove((int) x.solve(),(int) y.solve()); //Human can now move
+            } else if (ag.contentEquals("robot") && action.getFunctor().equals("moveAway")) {
+            	model.moveAwayFromHuman(); //Human can now move
             } else if (ag.contentEquals("robot") && action.getFunctor().equals("block")) {
             	model.robotBlock();
             }
@@ -179,7 +181,7 @@ public class EthGovs extends Environment {
 				System.out.println("Robot stayed at " + robotLoc.x + "," + robotLoc.y);
 			}
 			else {
-				System.out.println("Robot moved to " + robotLoc.x + "," + robotLoc.y); //Show in the console where the robot moved to
+				System.out.println("Robot moved to " + x + "," + y); //Show in the console where the robot moved to
 			}
 			
 			robotLoc.x = x;
@@ -190,7 +192,12 @@ public class EthGovs extends Environment {
 
         }
 		
-		void moveAwayFromHuman(Location governors, Location human) {
+		void moveAwayFromHuman() {
+			
+			
+			Location governors = getAgPos(1);
+			Location human = getAgPos(0);
+			
 			double[] distances = new double[15];
 			double minDistance;
 			
@@ -404,11 +411,11 @@ public class EthGovs extends Environment {
 					if (governors.y > destination.y) {
 						governors.y--;
 					}
-					
 					setAgPos(1,governors);
 					System.out.println("Robot moved to " + governors.x + "," + governors.y);
 					
 				} catch (IndexOutOfBoundsException e){
+					logger.info("Error!");
 				}
 			}
 		}

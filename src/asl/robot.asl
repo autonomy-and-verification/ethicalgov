@@ -43,8 +43,9 @@
 +choice(22)
 <-
 	.print("Choice 22");
-	.print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ To be implemented");
-	.wait(999999);
+	-choice(_)[source(_)];
+	moveAway;
+	!human_step;
 	.
 	
 	
