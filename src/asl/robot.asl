@@ -74,17 +74,23 @@
 	
 +!move_away : pos(robot,RX,RY) & pos(human,HX,HY)
 <-
-	if (RX <= HX) {
+	if ((RX <= HX)  & (RX - 1 >= 0)) {
 		X = RX - 1;
 	}
-	elif (RX > HX) {
+	elif ((RX > HX)  & (RX + 1 >= 10)) {
 		X = RX + 1;
 	}
-	if (RY <= HY) {
+	else {
+		X = RX;
+	}
+	if ((RY <= HY)  & (RY - 1 >= 0)) {
 		Y = RY - 1;
 	}
-	elif (RY > HY) {
+	elif ((RY > HY)  & (RY + 1 >= 10)) {
 		Y = RY + 1;
+	}
+	else {
+		Y = RY;
 	}
 	move(X,Y);
 	.
