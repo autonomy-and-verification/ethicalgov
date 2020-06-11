@@ -54,7 +54,7 @@
 	if (RX < HX) {
 		X = RX + 1;
 	}
-	elif (HX > HX) {
+	elif (RX > HX) {
 		X = RX - 1;
 	}
 	else {
@@ -77,7 +77,7 @@
 	if (RX <= HX) {
 		X = RX - 1;
 	}
-	elif (HX > HX) {
+	elif (RX > HX) {
 		X = RX + 1;
 	}
 	if (RY <= HY) {
