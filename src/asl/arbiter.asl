@@ -1,9 +1,11 @@
 proximity_count(0).
 protective_gear(false).
-knowledge_hazard(true).
+knowledge_hazard(false).
 permission(false).
 autonomy_multiplier(1).
 safety_multiplier(1).
+
++stop <- .stopMAS.
 
 @safety1[atomic]
 +safety_choice(_, _) : not autonomy_choice(_,_) <- .print("Received safety choice. Waiting for autonomy choice.").
@@ -57,9 +59,10 @@ safety_multiplier(1).
 	} elif ( knowledge_hazard(true) ) {
 		AutonomyScore = AR * 1.2;
 		SafetyScore = SR * 1.4;
-	} else {
-		SafetyScore = SR * 1.6;
-	}
+	} 
+//	else {
+//		SafetyScore = SR * 1.6;
+//	}
 	
 	FinalAutonomyScore = AutonomyScore * AutonomyMultiplier;
 	FinalSafetyScore = SafetyScore * SafetyMultiplier;

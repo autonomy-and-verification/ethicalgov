@@ -24,6 +24,11 @@ public class EthGovs extends Environment {
 	
 	public boolean blocked = false;
 	
+	public int block = 0;
+	public int hazards = 0;
+	public int goals = 0;
+	public int step = 0;
+	
 	int randomWithRange(int min, int max)
     {
        int range = (max - min) + 1;     
@@ -62,6 +67,8 @@ public class EthGovs extends Environment {
             	NumberTerm x = (NumberTerm) action.getTerm(0);
             	NumberTerm y = (NumberTerm) action.getTerm(1);
             	model.humanMove((int) x.solve(),(int) y.solve()); //Human can now move
+            }  else if (ag.contentEquals("human") && action.getFunctor().equals("achieve")) {
+            	goals++;
             } else if (ag.contentEquals("robot") && action.getFunctor().equals("move")) {
             	NumberTerm x = (NumberTerm) action.getTerm(0);
             	NumberTerm y = (NumberTerm) action.getTerm(1);
@@ -70,7 +77,7 @@ public class EthGovs extends Environment {
             	model.robotBlock();
             }
             
-            if (ag.contentEquals("human") && (action.getFunctor().equals("move") || action.getFunctor().equals("skip"))) {
+            if (ag.contentEquals("human") && (action.getFunctor().equals("move") || action.getFunctor().equals("skip") || action.getFunctor().equals("achieve") )) {
         		updatePercepts(); //Update percepts ready for the next reasoning cycle
                 try {
                     Thread.sleep(400); // wait o.2 seconds before next reasoning cycle
@@ -109,25 +116,37 @@ public class EthGovs extends Environment {
 		Literal gloc4 = Literal.parseLiteral("goal(4," + loc4.x + "," + loc4.y + ")");
 		Literal gloc5 = Literal.parseLiteral("goal(5," + loc5.x + "," + loc5.y + ")");
 		
-		Literal step = Literal.parseLiteral("new_step");
+		Literal newstep = Literal.parseLiteral("new_step");
+		step++;
+		logger.info("@@@@ New step "+step+" @@@@");
 		
-		logger.info("@@@@ New step @@@@");
-		
-		// All percepts added
-        addPercept(pos1);
-		addPercept(pos2);
-		addPercept(haz1);
-		addPercept(haz2);
-		addPercept(haz3);
-		addPercept(haz4);
-		addPercept(haz5);
-		addPercept(gloc1);
-		addPercept(gloc2);
-		addPercept(gloc3);
-		addPercept(gloc4);
-		addPercept(gloc5);
-		addPercept("safetygov",step);
-		addPercept("autonomygov",step);
+		if (step == 201) {
+			Literal stop = Literal.parseLiteral("stop");
+//			logger.info("@@@@@@@@@@@@@ END @@@@@@@@@@@@@ ");
+//			logger.info("Blocks "+block);
+//			logger.info("Hazards "+hazards);
+//			logger.info("Goals "+goals);
+//            try {
+//                Thread.sleep(200000); // wait o.2 seconds before next reasoning cycle
+//            } catch (Exception e) {}
+			addPercept("arbiter",stop);
+		} else {
+			// All percepts added
+	        addPercept(pos1);
+			addPercept(pos2);
+			addPercept(haz1);
+			addPercept(haz2);
+			addPercept(haz3);
+			addPercept(haz4);
+			addPercept(haz5);
+			addPercept(gloc1);
+			addPercept(gloc2);
+			addPercept(gloc3);
+			addPercept(gloc4);
+			addPercept(gloc5);
+			addPercept("safetygov",newstep);
+			addPercept("autonomygov",newstep);
+		}
 		
     }
 	
@@ -167,6 +186,7 @@ public class EthGovs extends Environment {
 		void robotBlock() {
 			Location robotLoc = getAgPos(1);
 			blocked = true;
+			block++;
 			setAgPos(1,robotLoc);
 			System.out.println("Robot is blocking human");
 		}
@@ -192,6 +212,7 @@ public class EthGovs extends Environment {
 		
 		void humanMove(int x, int y) { // This will be the human's calculated movement based on the goal tiles
 			Location humanLoc = getAgPos(0);
+			Location robotLoc = getAgPos(1);
 			humanLoc.x = x;
 			humanLoc.y = y;
 			if(((humanLoc.x == hazLoc1.x) && (humanLoc.y == hazLoc1.y)) ||
@@ -199,9 +220,11 @@ public class EthGovs extends Environment {
 			   ((humanLoc.x == hazLoc3.x) && (humanLoc.y == hazLoc3.y)) ||
 			   ((humanLoc.x == hazLoc4.x) && (humanLoc.y == hazLoc4.y)) ||
 			   ((humanLoc.x == hazLoc5.x) && (humanLoc.y == hazLoc5.y))){
+				   hazards++;
 				   logger.severe("HUMAN STEPPED ON HAZARD");
 			}
 			setAgPos(0,humanLoc);
+			setAgPos(1,robotLoc);
 			//Formally change the humans location, and show in console where he moved to
 			System.out.println("Human moved to " + humanLoc.x + "," + humanLoc.y);
 		}
