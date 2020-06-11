@@ -44,7 +44,7 @@
 <-
 	.print("Choice 22");
 	-choice(_)[source(_)];
-	moveAway;
+	!move_away;
 	!human_step;
 	.
 	
@@ -68,6 +68,23 @@
 	}
 	else {
 		Y = RY;
+	}
+	move(X,Y);
+	.
+	
++!move_away : pos(robot,RX,RY) & pos(human,HX,HY)
+<-
+	if (RX <= HX) {
+		X = RX - 1;
+	}
+	elif (HX > GX) {
+		X = RX + 1;
+	}
+	if (RY <= HY) {
+		Y = RY - 1;
+	}
+	elif (RY > HY) {
+		Y = RY + 1;
 	}
 	move(X,Y);
 	.
