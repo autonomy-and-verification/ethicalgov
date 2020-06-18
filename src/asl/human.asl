@@ -1,7 +1,24 @@
 goal_step(1).
+skip(0).
+
++!act : skip(S) & S < 2 & S > 0
+<-
+	-skip(S);
+	+skip(S+1);
+	skip
+	.
+	
++!act : skip(2)
+<-
+	-skip(2);
+	+skip(0);
+	skip
+	.
 
 +!act : not achieving_goal(_,_) & goal_step(Gstep)
 <-
+	-skip(0);
+	+skip(2);
 	.print("I am acting now");
 //	.wait(400);
 	?goal(Gstep,X,Y);
@@ -44,6 +61,8 @@ goal_step(1).
 	
 +!act : achieving_goal(X,Y)
 <-
+	-skip(0);
+	+skip(2);
 	.print("I am acting now");
 //	.wait(400);
 	!move(X,Y);
@@ -55,59 +74,43 @@ goal_step(1).
 	+y(HY);
 	if (HX < GX) {
 		if (pos(hazard,HX+1,HY)) {
-			-x(HX);
-			-y(HY);
-			+x(HX + 1);
-			+y(HY + 1);
+			X = HX + 2;
 		}
 		else {
-			-x(HX);
-			+x(HX + 1);
+			X = HX + 1;
 		}
 	}
 	elif (HX > GX) {
 		if (pos(hazard,HX-1,HY)) {
-			-x(HX);
-			-y(HY);
-			+x(HX - 1);
-			+y(HY - 1);
+			X = HX - 2;
 		}
 		else {
-			-x(HX);
-			+x(HX - 1);
+			X = HX - 1;
 		}
 	}
-	?x(HX2);
-	?y(HY2);
-	if  (HY < GY) {
-		if (pos(hazard,HX,HY+1)) {
-			-x(HX2);
-			-y(HY2);
-			+x(HX2 + 1);
-			+y(HY2 + 1);
+	else {
+		X = HX;
+	}
+	
+	if (HY < GY) {
+		if (pos(hazard,X,HY+1)) {
+			Y = HY + 2;
 		}
 		else {
-			-y(HY2);
-			+y(HY2 + 1);
+			Y = HY + 1;
 		}
 	}
 	elif (HY > GY) {
-		if (pos(hazard,HX,HY-1)) {
-			-x(HX2);
-			-y(HY2);
-			+x(HX2 - 1);
-			+y(HY2 - 1);
+		if (pos(hazard,X,HY-1)) {
+			Y = HY - 2;
 		}
 		else {
-			-y(HY2);
-			+y(HY2 - 1);
+			Y = HY - 1;
 		}
 	}
-	
-	?x(X);
-	?y(Y);
-	-x(X);
-	-y(Y);
+	else {
+		Y = HY;
+	}
 	
 	if (not (X == HX & Y == HY)) {
 		-blocked[source(_)];

@@ -11,6 +11,12 @@ import java.awt.Graphics;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+
 public class EthGovs extends Environment {
 
     public static final int GSize = 10; // grid size
@@ -24,10 +30,12 @@ public class EthGovs extends Environment {
 	
 	public boolean blocked = false;
 	
+	public int step = 0;
 	public int block = 0;
 	public int hazards = 0;
 	public int goals = 0;
-	public int step = 0;
+	public int safety = 0;
+	public int autonomy = 0;
 	
 	int randomWithRange(int min, int max)
     {
@@ -36,21 +44,66 @@ public class EthGovs extends Environment {
     }
 	
 	// Locations generated randomly on the grid, to be used for the hazard locations
-	public Location hazLoc1 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
-	public Location hazLoc2 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
-	public Location hazLoc3 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
-	public Location hazLoc4 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
-	public Location hazLoc5 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
+//	public Location hazLoc1 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
+//	public Location hazLoc2 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
+//	public Location hazLoc3 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
+//	public Location hazLoc4 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
+//	public Location hazLoc5 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
+	public Location hazLoc1 = new Location(5, 3);
+	public Location hazLoc2 = new Location(1, 1);
+	public Location hazLoc3 = new Location(6, 2);
+	public Location hazLoc4 = new Location(4, 7);
+	public Location hazLoc5 = new Location(5, 4);
+//	public Location hazLoc1 = new Location(1, 3);
+//	public Location hazLoc2 = new Location(2, 3);
+//	public Location hazLoc3 = new Location(7, 6);
+//	public Location hazLoc4 = new Location(1, 6);
+//	public Location hazLoc5 = new Location(5, 4);
 	
 	// Locations generated randomly on the grid, to be used for the human's goals
-	public Location loc1 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
-	public Location loc2 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
-	public Location loc3 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
-	public Location loc4 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
-	public Location loc5 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
+//	public Location loc1 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
+//	public Location loc2 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
+//	public Location loc3 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
+//	public Location loc4 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
+//	public Location loc5 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
+	public Location loc1 = new Location(0, 8);
+	public Location loc2 = new Location(9, 3);
+	public Location loc3 = new Location(6, 3);
+	public Location loc4 = new Location(4, 2);
+	public Location loc5 = new Location(9, 5);
+//	public Location loc1 = new Location(9, 8);
+//	public Location loc2 = new Location(1, 9);
+//	public Location loc3 = new Location(8, 8);
+//	public Location loc4 = new Location(0, 1);
+//	public Location loc5 = new Location(7, 9);
+	
+//	map 1
+//	7,5 human
+//	4,9 robot
+//	0,8 9,3 6,3 4,2 9,5 goals
+//	5,3 1,1 6,2 4,7 5,4 hazards
+	
+// map 2
+//	0,8 human
+//	7,2 robot
+//	9,8 1,9 8,8 0,1 7,9 goals
+//	1,3 2,3 7,6 1,6 5,4 hazards
+	
 
     @Override
     public void init(String[] args) {
+	  try {
+		   File myFile = new File("results.csv");
+	 
+	   if (myFile.createNewFile()){
+		   System.out.println("File is created!");
+	   } else{
+		   System.out.println("File already exists.");
+	   }
+	  } catch (IOException e) {
+		  e.printStackTrace();
+	  }
+    		 
         model = new EGModel();
         view  = new EGView(model);
         model.setView(view);
@@ -75,6 +128,10 @@ public class EthGovs extends Environment {
             	model.robotMove((int) x.solve(),(int) y.solve()); //Human can now move
             } else if (ag.contentEquals("robot") && action.getFunctor().equals("block")) {
             	model.robotBlock();
+            } else if (ag.contentEquals("arbiter") && action.getFunctor().equals("safety")) {
+            	safety++;
+            } else if (ag.contentEquals("arbiter") && action.getFunctor().equals("autonomy")) {
+            	autonomy++;
             }
             
             if (ag.contentEquals("human") && (action.getFunctor().equals("move") || action.getFunctor().equals("skip") || action.getFunctor().equals("achieve") )) {
@@ -122,6 +179,19 @@ public class EthGovs extends Environment {
 		
 		if (step == 201) {
 			Literal stop = Literal.parseLiteral("stop");
+			File file = new File("results.csv");
+			try {
+				FileWriter fr = new FileWriter(file, true);
+				BufferedWriter br = new BufferedWriter(fr);
+				PrintWriter pr = new PrintWriter(br);
+				pr.println(block+","+hazards+","+goals+","+safety+","+autonomy);
+				pr.close();
+				br.close();
+				fr.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 //			logger.info("@@@@@@@@@@@@@ END @@@@@@@@@@@@@ ");
 //			logger.info("Blocks "+block);
 //			logger.info("Hazards "+hazards);
@@ -156,16 +226,48 @@ public class EthGovs extends Environment {
 
         private EGModel() {
             super(GSize, GSize, 2); // From GridWorldModel
-
+            File file = new File("results.csv");
             // initial location of agents
             try {
-				Location humanLoc = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1)); //Random locations on the board
-				Location robotLoc = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1)); //Random locations on the board
+//				Location humanLoc = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1)); //Random locations on the board
+//				Location robotLoc = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1)); //Random locations on the board
+				Location humanLoc = new Location(7, 5);
+				Location robotLoc = new Location(4, 9);
+//				Location humanLoc = new Location(0, 8);
+//				Location robotLoc = new Location(7, 2);
+//				try {
+//					FileWriter fr = new FileWriter(file, true);
+//					BufferedWriter br = new BufferedWriter(fr);
+//					PrintWriter pr = new PrintWriter(br);
+//					pr.println(humanLoc);
+//					pr.println(robotLoc);
+//					pr.close();
+//					br.close();
+//					fr.close();
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 				setAgPos(0, humanLoc);
 				setAgPos(1, robotLoc);
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            
+			
+//			try {
+//				FileWriter fr = new FileWriter(file, true);
+//				BufferedWriter br = new BufferedWriter(fr);
+//				PrintWriter pr = new PrintWriter(br);
+//				pr.println(loc1+" "+loc2+" "+loc3+" "+loc4+" "+loc5);
+//				pr.println(hazLoc1+" "+hazLoc2+" "+hazLoc3+" "+hazLoc4+" "+hazLoc5);
+//				pr.close();
+//				br.close();
+//				fr.close();
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 
             // initial location of Goals.
             add(GOAL, loc1);

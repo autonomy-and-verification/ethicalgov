@@ -1,8 +1,8 @@
 proximity_count(0).
 protective_gear(false).
-knowledge_hazard(false).
+knowledge_hazard(true).
 permission(false).
-autonomy_multiplier(1).
+autonomy_multiplier(1.1).
 safety_multiplier(1).
 
 +stop <- .stopMAS.
@@ -69,10 +69,13 @@ safety_multiplier(1).
 	
 	if ( FinalSafetyScore >= FinalAutonomyScore ) {
 		.print("Chose safety proposal.");
+		safety;
 		Choice = SC;
 	} else {
-		Choice = AC;
 		.print("Chose autonomy proposal.");
+		autonomy;
+		Choice = AC;
+		
 	}
 	
 	.send(robot,tell,choice(Choice));
