@@ -3,13 +3,13 @@ MAS egsim {
 
     infrastructure: Centralised
 
-    environment: EthGovs
+//    environment: EthGovs
 
-    agents: human; 
-    robot;
-    safetygov;
-    autonomygov;
-    arbiter;
+    agents: autonomygov;
+    		safetygov;
+    		robot;
+    		arbiter;
+    
     
     aslSourcePath:
 		"src/asl";
