@@ -17,11 +17,19 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 
+import java.util.Set;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
+
 public class EthGovs extends Environment {
 
     public static final int GSize = 10; // grid size
     public static final int GOAL  = 16; // code in grid model
-	public static final int HAZARD = 8; // code in grid model
+	public static final int HAZARD_RED = 8; // code in grid model
+	public static final int HAZARD_ORANGE = 32; // code in grid model
+	public static final int HAZARD_YELLOW = 64; // code in grid model
+	
 
     static Logger logger = Logger.getLogger(EthGovs.class.getName()); // We can use this as output for our simulation
 
@@ -49,11 +57,7 @@ public class EthGovs extends Environment {
 //	public Location hazLoc3 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
 //	public Location hazLoc4 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
 //	public Location hazLoc5 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
-	public Location hazLoc1 = new Location(5, 3);
-	public Location hazLoc2 = new Location(1, 1);
-	public Location hazLoc3 = new Location(6, 2);
-	public Location hazLoc4 = new Location(4, 7);
-	public Location hazLoc5 = new Location(5, 4);
+	public List<Location> hazardsLocations = new ArrayList<>();
 //	public Location hazLoc1 = new Location(1, 3);
 //	public Location hazLoc2 = new Location(2, 3);
 //	public Location hazLoc3 = new Location(7, 6);
@@ -103,6 +107,12 @@ public class EthGovs extends Environment {
 	  } catch (IOException e) {
 		  e.printStackTrace();
 	  }
+	  
+		hazardsLocations.add(new Location(5, 3));
+		hazardsLocations.add(new Location(1, 1));
+		hazardsLocations.add(new Location(6, 2));
+		hazardsLocations.add(new Location(4, 7));
+		hazardsLocations.add(new Location(5, 4));
     		 
         model = new EGModel();
         view  = new EGView(model);
@@ -160,11 +170,18 @@ public class EthGovs extends Environment {
 		Literal pos2 = Literal.parseLiteral("pos(robot," + robotLoc.x + "," + robotLoc.y + ")");
 		
 		// Locations of hazards as percepts
-		Literal haz1 = Literal.parseLiteral("pos(hazard," + hazLoc1.x + "," + hazLoc1.y + ")");
-		Literal haz2 = Literal.parseLiteral("pos(hazard," + hazLoc2.x + "," + hazLoc2.y + ")");
-		Literal haz3 = Literal.parseLiteral("pos(hazard," + hazLoc3.x + "," + hazLoc3.y + ")");
-		Literal haz4 = Literal.parseLiteral("pos(hazard," + hazLoc4.x + "," + hazLoc4.y + ")");
-		Literal haz5 = Literal.parseLiteral("pos(hazard," + hazLoc5.x + "," + hazLoc5.y + ")");
+		Set<Location> set = new HashSet<Location>();
+		for(int i = 0; i < EthGovs.GSize; i++) {
+			for(int j = 0; j < EthGovs.GSize; j++) {
+				for(Location center : hazardsLocations) {
+					Location loc = new Location(i,j);
+					if(!set.contains(loc) && center.distanceManhattan(loc) < 3) {
+						addPercept(Literal.parseLiteral("pos(hazard," + loc.x + "," + loc.y + "," + (center.distanceManhattan(loc) == 0 ? "red" : (center.distanceManhattan(loc) == 1 ? "orange" : "yellow")) + ")"));
+						set.add(loc);
+					}
+				}
+			}
+		}
 		
 		// Locations of goals as percepts
 		Literal gloc1 = Literal.parseLiteral("goal(1," + loc1.x + "," + loc1.y + ")");
@@ -173,7 +190,7 @@ public class EthGovs extends Environment {
 		Literal gloc4 = Literal.parseLiteral("goal(4," + loc4.x + "," + loc4.y + ")");
 		Literal gloc5 = Literal.parseLiteral("goal(5," + loc5.x + "," + loc5.y + ")");
 		
-		Literal newstep = Literal.parseLiteral("new_step");
+		Literal newstep = Literal.parseLiteral("new_step"); //(" + step + ")");
 		step++;
 		logger.info("@@@@ New step "+step+" @@@@");
 		
@@ -204,11 +221,6 @@ public class EthGovs extends Environment {
 			// All percepts added
 	        addPercept(pos1);
 			addPercept(pos2);
-			addPercept(haz1);
-			addPercept(haz2);
-			addPercept(haz3);
-			addPercept(haz4);
-			addPercept(haz5);
 			addPercept(gloc1);
 			addPercept(gloc2);
 			addPercept(gloc3);
@@ -277,12 +289,44 @@ public class EthGovs extends Environment {
             add(GOAL, loc5);
 			
 			//initial locations of hazards
-			add(HAZARD, hazLoc1);
-            add(HAZARD, hazLoc2);
-            add(HAZARD, hazLoc3);
-            add(HAZARD, hazLoc4);
-            add(HAZARD, hazLoc5);
+			
+			addHazards();
         }
+		
+		void addHazards() {
+			Set<Location> set = new HashSet<Location>();
+			for(Location center : hazardsLocations) {
+				add(HAZARD_RED, center);
+				set.add(center);
+			}
+			
+			for(int i = 0; i < EthGovs.GSize; i++) {
+				for(int j = 0; j < EthGovs.GSize; j++) {
+					for(Location center : hazardsLocations) {
+						Location loc = new Location(i,j);
+						if(!set.contains(loc) && center.distanceManhattan(loc) == 1) {
+							add(HAZARD_ORANGE, loc);
+							set.add(loc);
+							break;
+						}
+					}
+				}
+			}
+			
+			for(int i = 0; i < EthGovs.GSize; i++) {
+				for(int j = 0; j < EthGovs.GSize; j++) {
+					for(Location center : hazardsLocations) {
+						Location loc = new Location(i,j);
+						if(!set.contains(loc) && center.distanceManhattan(loc) == 2) {
+							add(HAZARD_YELLOW, loc);
+							set.add(loc);
+							break;
+						}
+					}
+				}
+			}
+			
+		}
 		
 		
 		void robotBlock() {
@@ -317,14 +361,14 @@ public class EthGovs extends Environment {
 			Location robotLoc = getAgPos(1);
 			humanLoc.x = x;
 			humanLoc.y = y;
-			if(((humanLoc.x == hazLoc1.x) && (humanLoc.y == hazLoc1.y)) ||
-			   ((humanLoc.x == hazLoc2.x) && (humanLoc.y == hazLoc2.y)) ||
-			   ((humanLoc.x == hazLoc3.x) && (humanLoc.y == hazLoc3.y)) ||
-			   ((humanLoc.x == hazLoc4.x) && (humanLoc.y == hazLoc4.y)) ||
-			   ((humanLoc.x == hazLoc5.x) && (humanLoc.y == hazLoc5.y))){
-				   hazards++;
-				   logger.severe("HUMAN STEPPED ON HAZARD");
+			for(Location h : hazardsLocations) {
+				if(h.x == humanLoc.x && h.y == humanLoc.y) {
+					hazards++;	
+					logger.severe("HUMAN STEPPED ON HAZARD");
+					break;
+				}
 			}
+			
 			setAgPos(0,humanLoc);
 			setAgPos(1,robotLoc);
 			//Formally change the humans location, and show in console where he moved to
@@ -365,14 +409,16 @@ public class EthGovs extends Environment {
         @Override
         public void draw(Graphics g, int x, int y, int object) { // Uses the methods to draw the defined objects i.e. drawGarb()
             switch (object) {
-				case EthGovs.HAZARD:
-					drawHazard(g, x, y);
-//					logger.info("Hazard pos "+g+" "+x+" "+y);
-					break;
 				case EthGovs.GOAL:
 					drawGoal(g, x, y);
 //					logger.info("Goal pos "+g+" "+x+" "+y);
 					break; //Going to have to modify this bit for the hazard
+				case EthGovs.HAZARD_RED:
+				case EthGovs.HAZARD_ORANGE:
+				case EthGovs.HAZARD_YELLOW:
+					drawHazard(g, x, y, object);
+//					logger.info("Hazard pos "+g+" "+x+" "+y);
+					break;
             } 
         }
 
@@ -380,29 +426,49 @@ public class EthGovs extends Environment {
         public void drawAgent(Graphics g, int x, int y, Color c, int id) { // Method for drawing the agent. This is all purely for visual purposes
 			String label;
 			if(id == 0) {
+				if (blocked) {
+					g.setColor(Color.black);
+				} else {
+					g.setColor(Color.pink);
+				}
 				label = "H";
 			} else {
+				g.setColor(Color.blue);				
 				label = "R";
 			}
-            c = Color.blue;
-            if (blocked) {
-				label += " - P";
-				c = Color.orange;
-            }
+			g.fillOval(x * cellSizeW + 10, y * cellSizeH + 10, cellSizeW-20, cellSizeH-20);
+            g.setColor(Color.white);
             super.drawString(g, x, y, defaultFont, label);
             repaint(0);
         }
 
 		public void drawGoal(Graphics g, int x, int y) { // To be used in the draw() method.
-            super.drawObstacle(g, x, y);
-            g.setColor(Color.white);
+            g.setColor(Color.green);
+			//g.fillOval(x * cellSizeW + 10, y * cellSizeH + 10, cellSizeW-20, cellSizeH-20);
+			g.drawPolygon(new int[] {x * cellSizeW + 5, x * cellSizeW + ((int)(cellSizeW/2)), x * cellSizeW + cellSizeW - 5}, new int[] {y * cellSizeH + (cellSizeH / 4), y * cellSizeH  + (cellSizeH - 5), y * cellSizeH + (cellSizeH / 4)}, 3);
+			g.setColor(Color.black);
             drawString(g, x, y, defaultFont, "G");
         }
 		
-		public void drawHazard(Graphics g, int x, int y) { // To be used in the draw() method.
-            super.drawObstacle(g, x, y);
-            g.setColor(Color.red);
-            drawString(g, x, y, defaultFont, "H");
+		public void drawHazard(Graphics g, int x, int y, int lvl) { // To be used in the draw() method.
+			System.out.println(lvl);
+            switch(lvl) {
+				case HAZARD_RED:
+					g.setColor(new Color(1f, 0f, 0f, 0.5f));	
+					break;
+				case HAZARD_ORANGE:
+					g.setColor(Color.orange);
+					break;
+				case HAZARD_YELLOW:
+					g.setColor(Color.yellow);
+			}
+			for(int i = 0; i < 4; i++) {
+				g.drawRect(x * cellSizeW + i, y * cellSizeH + i, cellSizeW - (i * 2), cellSizeH - (i * 2));
+			}
+			//g.drawRect(x * cellSizeW + 4, y * cellSizeH + 3, cellSizeW - 3, cellSizeH - 3);
+			//g.drawRect(x * cellSizeW + 3, y * cellSizeH + 2, cellSizeW - 2, cellSizeH - 2);
+            //drawString(g, x, y, defaultFont, "H");
         }
     }
 }
+

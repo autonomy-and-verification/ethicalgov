@@ -3,7 +3,7 @@ MAS egsim {
 
     infrastructure: Centralised
 
-//    environment: EthGovs
+    environment: EthGovs
 
     agents: autonomygov;
     		safetygov;
