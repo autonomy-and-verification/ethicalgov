@@ -18,7 +18,11 @@ count(0).
 +!arbiter_choice : reasoning(utilitarian) & execution_agent(Agent) 
 <- 
 	+choice(0,0,0);
+	
+	!proximity_count;
+	
 	for (governor_choice(GovernorType, Choice, Utility)) {
+		-governor_choice(GovernorType, Choice, Utility)[source(_)];
 		if ( type_multiplier(GovernorType, TypeMultiplier) ) { // type multiplier has to be set by the developer
 			NewUtility = TypeMultiplier * Utility;
 		} else { // otherwise only the basic multiplier of the governor choice is used
@@ -32,6 +36,7 @@ count(0).
 	}
 	
 	?choice(Utility, GovernorType, Choice);
+	-choice(Utility, GovernorType, Choice);
 	
 	.print("Chose action proposal from ", GovernorType, " governor with utility ", Utility, " and with choice: ", Choice);
 	

@@ -9,7 +9,7 @@ MAS egsim {
     		safetygov;
     		robot;
     		arbiter_agent;
-    
+    		human;
     
     aslSourcePath:
 		"src/asl";

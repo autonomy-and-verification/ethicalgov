@@ -176,7 +176,8 @@ public class EthGovs extends Environment {
 				for(Location center : hazardsLocations) {
 					Location loc = new Location(i,j);
 					if(!set.contains(loc) && center.distanceManhattan(loc) < 3) {
-						addPercept(Literal.parseLiteral("pos(hazard," + loc.x + "," + loc.y + "," + (center.distanceManhattan(loc) == 0 ? "red" : (center.distanceManhattan(loc) == 1 ? "orange" : "yellow")) + ")"));
+//						addPercept(Literal.parseLiteral("pos(hazard," + loc.x + "," + loc.y + "," + (center.distanceManhattan(loc) == 0 ? "red" : (center.distanceManhattan(loc) == 1 ? "orange" : "yellow")) + ")"));
+						addPercept(Literal.parseLiteral("pos(hazard," + loc.x + "," + loc.y+  ")"));
 						set.add(loc);
 					}
 				}
@@ -190,8 +191,12 @@ public class EthGovs extends Environment {
 		Literal gloc4 = Literal.parseLiteral("goal(4," + loc4.x + "," + loc4.y + ")");
 		Literal gloc5 = Literal.parseLiteral("goal(5," + loc5.x + "," + loc5.y + ")");
 		
+		
 		Literal newstep = Literal.parseLiteral("new_step"); //(" + step + ")");
+		Literal oldstep = Literal.parseLiteral("new_step"); //(" + step + ")");
+		oldstep.addTerm(new NumberTermImpl(step));
 		step++;
+		newstep.addTerm(new NumberTermImpl(step));
 		logger.info("@@@@ New step "+step+" @@@@");
 		
 		if (step == 201) {
@@ -226,8 +231,14 @@ public class EthGovs extends Environment {
 			addPercept(gloc3);
 			addPercept(gloc4);
 			addPercept(gloc5);
-			addPercept("safetygov",newstep);
-			addPercept("autonomygov",newstep);
+			removePercept("robot",oldstep);
+//			try {
+//				Thread.sleep(500);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+			addPercept("robot",newstep);
 		}
 		
     }
