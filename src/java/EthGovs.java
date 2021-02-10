@@ -57,7 +57,7 @@ public class EthGovs extends Environment {
 //	public Location hazLoc3 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
 //	public Location hazLoc4 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
 //	public Location hazLoc5 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
-	public List<Location> hazardsLocations = new ArrayList<>();
+	public List<Location> hazardsLocations = new ArrayList<Location>();
 //	public Location hazLoc1 = new Location(1, 3);
 //	public Location hazLoc2 = new Location(2, 3);
 //	public Location hazLoc3 = new Location(7, 6);
