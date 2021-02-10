@@ -7,8 +7,8 @@
 	.
 
 +!suggest_action
-	: type(GovernorType) // this is domain specific and has to be added by the developer
+	: arbiter(Arbiter) & type(GovernorType) // this is domain specific and has to be added by the developer
 <-
 	!make_choice(Choice, Utility); // this is domain specific and has to be written by the developer
-	.send(arbiter, tell, governor_choice(GovernorType, Choice, Utility));
+	.send(Arbiter, tell, governor_choice(GovernorType, Choice, Utility));
 	.

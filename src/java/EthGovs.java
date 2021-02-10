@@ -108,11 +108,11 @@ public class EthGovs extends Environment {
 		  e.printStackTrace();
 	  }
 	  
-		hazardsLocations.add(new Location(5, 3));
+//		hazardsLocations.add(new Location(5, 3));
 		hazardsLocations.add(new Location(1, 1));
-		hazardsLocations.add(new Location(6, 2));
+//		hazardsLocations.add(new Location(6, 2));
 		hazardsLocations.add(new Location(4, 7));
-		hazardsLocations.add(new Location(5, 4));
+//		hazardsLocations.add(new Location(5, 4));
     		 
         model = new EGModel();
         view  = new EGView(model);
@@ -451,7 +451,7 @@ public class EthGovs extends Environment {
         }
 		
 		public void drawHazard(Graphics g, int x, int y, int lvl) { // To be used in the draw() method.
-			System.out.println(lvl);
+//			System.out.println(lvl);
             switch(lvl) {
 				case HAZARD_RED:
 					g.setColor(new Color(1f, 0f, 0f, 0.5f));	

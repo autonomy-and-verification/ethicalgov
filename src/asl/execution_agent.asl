@@ -3,7 +3,7 @@
 +!introductions 
 	: .my_name(Me)
 <-
-	.broadcast(tell, agent_name(Me));
+	.broadcast(tell, execution_agent(Me));
 	.
 
 +!act
