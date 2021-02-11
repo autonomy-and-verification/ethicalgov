@@ -176,8 +176,8 @@ public class EthGovs extends Environment {
 				for(Location center : hazardsLocations) {
 					Location loc = new Location(i,j);
 					if(!set.contains(loc) && center.distanceManhattan(loc) < 3) {
-//						addPercept(Literal.parseLiteral("pos(hazard," + loc.x + "," + loc.y + "," + (center.distanceManhattan(loc) == 0 ? "red" : (center.distanceManhattan(loc) == 1 ? "orange" : "yellow")) + ")"));
-						addPercept(Literal.parseLiteral("pos(hazard," + loc.x + "," + loc.y+  ")"));
+						addPercept(Literal.parseLiteral("pos(hazard," + loc.x + "," + loc.y + "," + (center.distanceManhattan(loc) == 0 ? "red" : (center.distanceManhattan(loc) == 1 ? "orange" : "yellow")) + ")"));
+//						addPercept(Literal.parseLiteral("pos(hazard," + loc.x + "," + loc.y+  ")"));
 						set.add(loc);
 					}
 				}

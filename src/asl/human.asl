@@ -73,7 +73,7 @@ skip(0).
 	+x(HX);
 	+y(HY);
 	if (HX < GX) {
-		if (pos(hazard,HX+1,HY)) {
+		if (pos(hazard,HX+1,HY, _)) {
 			X = HX + 2;
 		}
 		else {
@@ -81,7 +81,7 @@ skip(0).
 		}
 	}
 	elif (HX > GX) {
-		if (pos(hazard,HX-1,HY)) {
+		if (pos(hazard,HX-1,HY, _)) {
 			X = HX - 2;
 		}
 		else {
@@ -93,7 +93,7 @@ skip(0).
 	}
 	
 	if (HY < GY) {
-		if (pos(hazard,X,HY+1)) {
+		if (pos(hazard,X,HY+1, _)) {
 			Y = HY + 2;
 		}
 		else {
@@ -101,7 +101,7 @@ skip(0).
 		}
 	}
 	elif (HY > GY) {
-		if (pos(hazard,X,HY-1)) {
+		if (pos(hazard,X,HY-1, _)) {
 			Y = HY - 2;
 		}
 		else {
