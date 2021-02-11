@@ -436,7 +436,7 @@ public class EthGovs extends Environment {
         @Override
         public void drawAgent(Graphics g, int x, int y, Color c, int id) { // Method for drawing the agent. This is all purely for visual purposes
 			String label;
-			
+			if(blocked) System.out.println("id: " + id);
 			if(model.getAgPos(0).x == model.getAgPos(1).x && model.getAgPos(0).y == model.getAgPos(1).y) {
 				if(blocked) {
 					g.setColor(Color.black);
@@ -451,8 +451,13 @@ public class EthGovs extends Environment {
 					g.setColor(Color.pink);
 					label = "H";
 				} else {
-					g.setColor(Color.blue);
-					label = "R";
+					if(blocked) {
+						g.setColor(Color.red);
+						label = "Wrn!";
+					} else {
+						g.setColor(Color.blue);
+						label = "R";
+					}
 				}
 				g.fillOval(x * cellSizeW + 10, y * cellSizeH + 10, cellSizeW-20, cellSizeH-20);
 				g.setColor(Color.white);

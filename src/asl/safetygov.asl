@@ -15,6 +15,7 @@ near2(A,C) :- near1(A,B) & near1(B,C) & not near1(A,C).
 inDanger1(A) :- near1(hazard, A).
 inDanger2(A) :- inDanger1(A) | near2(hazard, A).
 annoyed :- proximityScore(A) & A > 3.
+close(A, B, Th) :- pos(A, Ax, Ay) & pos(B, Bx, By) & (math.abs(Ax - Bx) + math.abs(Ay - By)) < Th.
 
 proximityScore(0).
 
@@ -41,32 +42,32 @@ proximityScore(0).
 	.print("Proximity score: ",Prox);
 .
 
-+!checkOnHuman(human, moveToward, 3) : inDanger2(human) & not at(human)
++!checkOnHuman(human, moveToward, 3) : inDanger2(human) & not close(human, robot, 2)//at(human)
 <- 
 	.print("Safety submitted moveToward");
 	.
 		   
-+!checkOnHuman(human, moveToward, 2) : not inDanger2(human) & not at(human) & not near1(human) & not annoyed
++!checkOnHuman(human, moveToward, 2) : not inDanger2(human) & not close(human, robot, 2) & not near1(human) & not annoyed //at(human)
 <- 
 	.print("Safety submitted moveToward");
 	.
 		   
-+!checkOnHuman(human, moveToward, 1) : not inDanger2(human) & not at(human) & not near1(human) & annoyed
++!checkOnHuman(human, moveToward, 1) : not inDanger2(human) & not close(human, robot, 2) & not near1(human) & annoyed //at(human)
 <- 
 	.print("Safety submitted moveToward");
 	.
 		   
-+!checkOnHuman(human, stayPutS, 2) : not inDanger2(human) & not at(human) & near1(human)
++!checkOnHuman(human, stayPutS, 2) : not inDanger2(human) & not close(human, robot, 2) & near1(human) //at(human)
 <- 
 	.print("Safety submitted stayPutS");
 	.
 		   
-+!checkOnHuman(human, prevent, 3) : inDanger2(human) & at(human)
++!checkOnHuman(human, prevent, 3) : inDanger2(human) & close(human, robot, 2) //at(human)
 <- 
 	.print("Safety submitted prevent");
 	.
 		
-+!checkOnHuman(human, stayPutS, 1) : not inDanger2(human) & at(human)
++!checkOnHuman(human, stayPutS, 1) : not inDanger2(human) & close(human, robot, 2) //at(human)
 <- 
 	.print("Safety submitted stayPutS");
 	.
