@@ -20,9 +20,26 @@ proximityScore(0).
 
 +!make_choice(Choice, Utility) 
 <- 
+	!proximity_count;
 	!checkOnHuman(human, Choice, Utility);
-	-proximityScore(_)[source(_)];
 	.
+	
++!proximity_count : pos(robot,RX,RY) & pos(human,HX,HY) & proximityScore(P)
+<- 
+	if ( (RX == HX & RY == HY) | (RX == HX - 1 & RY == HY + 1) | (RX == HX & RY == HY + 1) | (RX == HX + 1 & RY == HY + 1) | (RX == HX - 1 & RY == HY) | (RX == HX + 1 & RY == HY) | (RX == HX - 1 & RY == HY - 1) | (RX == HX & RY == HY - 1) | (RX == HX + 1 & RY == HY - 1) ) {
+		-proximityScore(P);
+		+proximityScore(P+1);
+	}
+	else {
+		if (P > 0) {
+			-proximityScore(P);
+			+proximityScore(P-1);
+		}
+	}
+	
+	?proximityScore(Prox);
+	.print("Proximity score: ",Prox);
+.
 
 +!checkOnHuman(human, moveToward, 3) : inDanger2(human) & not at(human)
 <- 
