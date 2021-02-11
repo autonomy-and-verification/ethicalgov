@@ -403,7 +403,7 @@ public class EthGovs extends Environment {
     }
 
     class EGView extends GridWorldView {
-
+		
         /**
 		 * 
 		 */
@@ -411,7 +411,7 @@ public class EthGovs extends Environment {
 
 		public EGView(EGModel model) {
             super(model, "Ethical Governor World", 600);  // Loads the gridworld with the current model as defined before, with window size 600
-            defaultFont = new Font("Arial", Font.BOLD, 18); // change default font
+            defaultFont = new Font("Arial", Font.BOLD, 16); // change default font
             setVisible(true);
             repaint();
         }
@@ -436,21 +436,31 @@ public class EthGovs extends Environment {
         @Override
         public void drawAgent(Graphics g, int x, int y, Color c, int id) { // Method for drawing the agent. This is all purely for visual purposes
 			String label;
-			if(id == 0) {
-				if (blocked) {
+			
+			if(model.getAgPos(0).x == model.getAgPos(1).x && model.getAgPos(0).y == model.getAgPos(1).y) {
+				if(blocked) {
 					g.setColor(Color.black);
 				} else {
-					g.setColor(Color.pink);
+					g.setColor(Color.green);
 				}
-				label = "H";
+				g.fillRect(x * cellSizeW + 10, y * cellSizeH + 10, cellSizeW-20, cellSizeH-20);
+				g.setColor(Color.white);
+				super.drawString(g, x, y, defaultFont, blocked ? "Blk" : "R+H");
 			} else {
-				g.setColor(Color.blue);				
-				label = "R";
+				if(id == 0) {
+					g.setColor(Color.pink);
+					label = "H";
+				} else {
+					g.setColor(Color.blue);
+					label = "R";
+				}
+				g.fillOval(x * cellSizeW + 10, y * cellSizeH + 10, cellSizeW-20, cellSizeH-20);
+				g.setColor(Color.white);
+				super.drawString(g, x, y, defaultFont, label);
 			}
-			g.fillOval(x * cellSizeW + 10, y * cellSizeH + 10, cellSizeW-20, cellSizeH-20);
-            g.setColor(Color.white);
-            super.drawString(g, x, y, defaultFont, label);
-            repaint(0);
+			
+			
+			repaint(0);
         }
 
 		public void drawGoal(Graphics g, int x, int y) { // To be used in the draw() method.

@@ -20,7 +20,7 @@ skip(0).
 	-skip(0);
 	+skip(2);
 	.print("I am acting now");
-//	.wait(400);
+	.wait(1000);
 	?goal(Gstep,X,Y);
 	+achieving_goal(X,Y);
 	!move(X,Y);
@@ -29,7 +29,7 @@ skip(0).
 +!act : timer(0) & goal_step(Gstep)
 <-
 	.print("I am acting now");
-//	.wait(400);
+	.wait(1000);
 	-timer(0);
 	-achieving_goal(_,_);
 	-goal_step(Gstep);
@@ -45,7 +45,7 @@ skip(0).
 +!act : timer(T)
 <-
 	.print("I am acting now");
-//	.wait(400);
+	.wait(1000);
 	-timer(T);
 	+timer(T-1);
 	skip;
@@ -54,7 +54,7 @@ skip(0).
 +!act : achieving_goal(X,Y) & pos(human,X,Y)
 <-
 	.print("I am acting now");
-//	.wait(400);
+	.wait(1000);
 	+timer(9);
 	skip;
 	.
@@ -64,7 +64,7 @@ skip(0).
 	-skip(0);
 	+skip(2);
 	.print("I am acting now");
-//	.wait(400);
+	.wait(1000);
 	!move(X,Y);
 	.
 	
