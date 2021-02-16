@@ -1,26 +1,9 @@
 goal_step(1).
-skip(0).
-
-+!act : skip(S) & S < 2 & S > 0
-<-
-	-skip(S);
-	+skip(S+1);
-	skip
-	.
-	
-+!act : skip(2)
-<-
-	-skip(2);
-	+skip(0);
-	skip
-	.
 
 +!act : not achieving_goal(_,_) & goal_step(Gstep)
 <-
-	-skip(0);
-	+skip(2);
 	.print("I am acting now");
-	.wait(1000);
+//	.wait(1000);
 	?goal(Gstep,X,Y);
 	+achieving_goal(X,Y);
 	!move(X,Y);
@@ -29,7 +12,7 @@ skip(0).
 +!act : timer(0) & goal_step(Gstep)
 <-
 	.print("I am acting now");
-	.wait(1000);
+//	.wait(1000);
 	-timer(0);
 	-achieving_goal(_,_);
 	-goal_step(Gstep);
@@ -45,7 +28,7 @@ skip(0).
 +!act : timer(T)
 <-
 	.print("I am acting now");
-	.wait(1000);
+//	.wait(1000);
 	-timer(T);
 	+timer(T-1);
 	skip;
@@ -54,38 +37,34 @@ skip(0).
 +!act : achieving_goal(X,Y) & pos(human,X,Y)
 <-
 	.print("I am acting now");
-	.wait(1000);
+//	.wait(1000);
 	+timer(9);
 	skip;
 	.
 	
 +!act : achieving_goal(X,Y)
 <-
-	-skip(0);
-	+skip(2);
 	.print("I am acting now");
-	.wait(1000);
+//	.wait(1000);
 	!move(X,Y);
 	.
 	
-+!move(GX,GY) : blocked & pos(human,HX,HY)
++!move(GX,GY) : blocked & pos(human,HX,HY) & pos(hazard,HX,HY,Lvl)
 <-
-	+x(HX);
-	+y(HY);
 	if (HX < GX) {
-		if (pos(hazard,HX+1,HY, _)) {
-			X = HX + 2;
+		if ((Lvl = red & not pos(hazard,HX+1,HY,orange)) | (Lvl = orange & not pos(hazard,HX+1,HY,red) & not pos(hazard,HX+1,HY,orange)) | (Lvl = yellow & not pos(hazard,HX+1,HY,_)) ) {
+			X = HX + 1;
 		}
 		else {
-			X = HX + 1;
+			X = HX;
 		}
 	}
 	elif (HX > GX) {
-		if (pos(hazard,HX-1,HY, _)) {
-			X = HX - 2;
+		if ((Lvl = red & not pos(hazard,HX-1,HY,orange)) | (Lvl = orange & not pos(hazard,HX-1,HY,red) & not pos(hazard,HX-1,HY,orange)) | (Lvl = yellow & not pos(hazard,HX-1,HY,_)) ) {
+			X = HX - 1;
 		}
 		else {
-			X = HX - 1;
+			X = HX;
 		}
 	}
 	else {
@@ -93,31 +72,51 @@ skip(0).
 	}
 	
 	if (HY < GY) {
-		if (pos(hazard,X,HY+1, _)) {
-			Y = HY + 2;
+		if ((Lvl = red & not pos(hazard,X,HY+1,orange)) | (Lvl = orange & not pos(hazard,HX,HY+1,red) & not pos(hazard,HX,HY+1,orange)) | (Lvl = yellow & not pos(hazard,HX,HY+1,_)) ) {
+			Y = HY + 1;
 		}
 		else {
-			Y = HY + 1;
+			Y = HY;
 		}
 	}
 	elif (HY > GY) {
-		if (pos(hazard,X,HY-1, _)) {
-			Y = HY - 2;
+		if ((Lvl = red & not pos(hazard,X,HY-1,orange)) | (Lvl = orange & not pos(hazard,HX,HY-1,red) & not pos(hazard,HX,HY-1,orange)) | (Lvl = yellow & not pos(hazard,HX,HY-1,_)) ) {
+			Y = HY - 1;
 		}
 		else {
-			Y = HY - 1;
+			Y = HY;
 		}
 	}
 	else {
 		Y = HY;
 	}
 	
-	if (not (X == HX & Y == HY)) {
-		-blocked[source(_)];
-		unblock;
+	if (X == HX & Y == HY) {
+		if (GX == X & GY < Y) {
+			FinalX = X-1;
+			FinalY = Y-1;
+		}
+		elif (GX == X & GY > Y) {
+			FinalX = X+1;
+			FinalY = Y+1;
+		}
+		elif (GX < X & GY == Y) {
+			FinalX = X-1;
+			FinalY = Y+1;
+		}
+		elif (GX > X & GY == Y) {
+			FinalX = X+1;
+			FinalY = Y+1;
+		}
+	} else {
+		FinalX = X;
+		FinalY = Y;
 	}
 	
-	move(X,Y);
+	-blocked[source(_)];
+	unblock;
+	
+	move(FinalX,FinalY);
 	.
 	
 +!move(GX,GY) : pos(human,HX,HY)

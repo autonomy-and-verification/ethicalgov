@@ -11,7 +11,7 @@ near(A, B, 1, Lvl) :-  (pos(A,X,Y) | pos(A,X,Y,Lvl)) & (pos(B,X-1,Y) | pos(B,X-1
 			   (pos(A,X,Y) | pos(A,X,Y,Lvl)) & (pos(B,X+1,Y-1) | pos(B,X+1,Y-1,Lvl)) |
 			   (pos(A,X,Y) | pos(A,X,Y,Lvl)) & (pos(B,X,Y+1) | pos(B,X,Y+1,Lvl)) |
 			   (pos(A,X,Y) | pos(A,X,Y,Lvl)) & (pos(B,X-1,Y+1) | pos(B,X-1,Y+1,Lvl)).
-near(A, B, Th, Lvl) :- Th > 1 & near(A, C, 1, Lvl) & near(C, B, Th-1, Lvl).
+near(A, B, Th, Lvl) :- Th > 1 & (near(A, B, 1, Lvl) | (near(A, C, 1, Lvl) & near(C, B, Th-1, Lvl))).
 /*near2(A,C) :- near1(A,B) & near1(B,C) & not near1(A,C).
 inDanger1(A) :- near1(hazard, A).
 inDanger2(A) :- inDanger1(A) | near2(hazard, A).*/
