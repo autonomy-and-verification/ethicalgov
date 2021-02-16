@@ -93,20 +93,40 @@ goal_step(1).
 	
 	if (X == HX & Y == HY) {
 		if (GX == X & GY < Y) {
-			FinalX = X-1;
+			if (not pos(hazard,X-1,Y-1,red)) {
+				FinalX = X-1;
+			}
+			else {
+				FinalX = X+1;
+			}
 			FinalY = Y-1;
 		}
 		elif (GX == X & GY > Y) {
-			FinalX = X+1;
+			if (not pos(hazard,X-1,Y+1,red)) {
+				FinalX = X-1;
+			}
+			else {
+				FinalX = X+1;
+			}
 			FinalY = Y+1;
 		}
 		elif (GX < X & GY == Y) {
+			if (not pos(hazard,X-1,Y+1,red)) {
+				FinalY = Y+1;
+			}
+			else {
+				FinalY = Y-1;
+			}
 			FinalX = X-1;
-			FinalY = Y+1;
 		}
 		elif (GX > X & GY == Y) {
+			if (not pos(hazard,X+1,Y+1,red)) {
+				FinalY = Y+1;
+			}
+			else {
+				FinalY = Y-1;
+			}
 			FinalX = X+1;
-			FinalY = Y+1;
 		}
 	} else {
 		FinalX = X;
