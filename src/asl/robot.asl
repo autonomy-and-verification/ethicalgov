@@ -95,7 +95,7 @@
 	if ((RX <= HX)  & (RX - 1 >= 0)) {
 		X = RX - 1;
 	}
-	elif ((RX > HX)  & (RX + 1 >= 10)) {
+	elif ((RX > HX)  & (RX + 1 <= 10)) {
 		X = RX + 1;
 	}
 	else {
@@ -104,7 +104,7 @@
 	if ((RY <= HY)  & (RY - 1 >= 0)) {
 		Y = RY - 1;
 	}
-	elif ((RY > HY)  & (RY + 1 >= 10)) {
+	elif ((RY > HY)  & (RY + 1 <= 10)) {
 		Y = RY + 1;
 	}
 	else {

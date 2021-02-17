@@ -129,10 +129,31 @@ public class EthGovs extends Environment {
             } else if (ag.contentEquals("human") && action.getFunctor().equals("move")) {
             	NumberTerm x = (NumberTerm) action.getTerm(0);
             	NumberTerm y = (NumberTerm) action.getTerm(1);
-            	model.humanMove((int) x.solve(),(int) y.solve()); //Human can now move
+            	int newX = 0;
+            	int newY = 0;
+            	if ((int) x.solve() >= 10) {
+            		newX = (int) x.solve() - 1;
+            	}
+            	else if ((int) x.solve() < 0) {
+            		newX = (int) x.solve() + 1;
+            	}
+            	else {
+            		newX = (int) x.solve();
+            	}
+            	if ((int) y.solve() >= 10) {
+            		newY = (int) y.solve() - 1;
+            	}
+            	else if ((int) y.solve() < 0) {
+            		newY = (int) y.solve() + 1;
+            	}
+            	else {
+            		newY = (int) y.solve();
+            	}
+            	model.humanMove(newX,newY); //Human can now move
             }  else if (ag.contentEquals("human") && action.getFunctor().equals("achieve")) {
             	goals++;
             } else if (ag.contentEquals("robot") && action.getFunctor().equals("move")) {
+            	blocked = false;
             	NumberTerm x = (NumberTerm) action.getTerm(0);
             	NumberTerm y = (NumberTerm) action.getTerm(1);
             	model.robotMove((int) x.solve(),(int) y.solve()); //Human can now move
@@ -164,6 +185,8 @@ public class EthGovs extends Environment {
 
         Location humanLoc = model.getAgPos(0); // Locations of agents positions
 		Location robotLoc = model.getAgPos(1);
+		
+		
 		
 		// Positions of human, and robot, as percepts
         Literal pos1 = Literal.parseLiteral("pos(human," + humanLoc.x + "," + humanLoc.y + ")"); // Belief for positions will be saved in this format

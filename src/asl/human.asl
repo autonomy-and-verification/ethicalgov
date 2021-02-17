@@ -134,9 +134,67 @@ goal_step(1).
 	}
 	
 	-blocked[source(_)];
-	unblock;
 	
 	move(FinalX,FinalY);
+	.
+	
++!move(GX,GY) : blocked & pos(human,HX,HY)
+<-
+	if (GX == HX & GY < HY) {
+		if (not pos(hazard,HX-1,HY-1,red)) {
+			X = HX-1;
+		}
+		else {
+			X = HX+1;
+		}
+		Y = HY-1;
+	}
+	elif (GX == HX & GY > HY) {
+		if (not pos(hazard,HX-1,HY+1,red)) {
+			X = HX-1;
+		}
+		else {
+			X = HX+1;
+		}
+		Y = HY+1;
+	}
+	elif (GX < HX & GY == HY) {
+		if (not pos(hazard,HX-1,HY+1,red)) {
+			Y = HY+1;
+		}
+		else {
+			Y = HY-1;
+		}
+		X = HX-1;
+	}
+	elif (GX > HX & GY == HY) {
+		if (not pos(hazard,HX+1,HY+1,red)) {
+			Y = HY+1;
+		}
+		else {
+			Y = HY-1;
+		}
+		X = HX+1;
+	}
+	else {
+		if (not pos(hazard,HX+1,HY+1,_)) {
+			X = HX+1;
+			Y = HY+1;
+		} elif (not pos(hazard,HX-1,HY+1,_)) {
+			X = HX-1;
+			Y = HY+1;
+		} elif (not pos(hazard,HX+1,HY-1,_)) {
+			X = HX+1;
+			Y = HY-1;
+		} elif (not pos(hazard,HX-1,HY-1,_)) {
+			X = HX-1;
+			Y = HY-1;
+		}
+	}
+	
+	-blocked[source(_)];
+	
+	move(X,Y);
 	.
 	
 +!move(GX,GY) : pos(human,HX,HY)
