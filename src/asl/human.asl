@@ -177,19 +177,82 @@ goal_step(1).
 		X = HX+1;
 	}
 	else {
-		if (not pos(hazard,HX+1,HY+1,_)) {
-			X = HX+1;
-			Y = HY+1;
-		} elif (not pos(hazard,HX-1,HY+1,_)) {
-			X = HX-1;
-			Y = HY+1;
-		} elif (not pos(hazard,HX+1,HY-1,_)) {
-			X = HX+1;
-			Y = HY-1;
-		} elif (not pos(hazard,HX-1,HY-1,_)) {
-			X = HX-1;
-			Y = HY-1;
+		if (GX < HX & GY < HY) {
+			if (not pos(hazard,HX-1,HY-1,_)) {
+				X = HX-1;
+				Y = HY-1;
+			} elif (not pos(hazard,HX-1,HY+1,_)) {
+				X = HX-1;
+				Y = HY+1;
+			} elif (not pos(hazard,HX+1,HY-1,_)) {
+				X = HX+1;
+				Y = HY-1;
+			} elif (not pos(hazard,HX+1,HY+1,_)) {
+				X = HX+1;
+				Y = HY+1;
+			}
 		}
+		elif (GX > HX & GY > HY) {
+			if (not pos(hazard,HX+1,HY+1,_)) {
+				X = HX+1;
+				Y = HY+1;
+			} elif (not pos(hazard,HX-1,HY+1,_)) {
+				X = HX-1;
+				Y = HY+1;
+			} elif (not pos(hazard,HX+1,HY-1,_)) {
+				X = HX+1;
+				Y = HY-1;
+			} elif (not pos(hazard,HX-1,HY-1,_)) {
+				X = HX-1;
+				Y = HY-1;
+			}
+		}
+		elif (GX > HX & GY < HY) {
+			if (not pos(hazard,HX+1,HY-1,_)) {
+				X = HX+1;
+				Y = HY-1;
+			} elif (not pos(hazard,HX+1,HY+1,_)) {
+				X = HX+1;
+				Y = HY+1;
+			} elif (not pos(hazard,HX-1,HY-1,_)) {
+				X = HX-1;
+				Y = HY-1;
+			} elif (not pos(hazard,HX-1,HY+1,_)) {
+				X = HX-1;
+				Y = HY+1;
+			} 
+		}
+		elif (GX < HX & GY > HY) {
+			if (not pos(hazard,HX-1,HY+1,_)) {
+				X = HX-1;
+				Y = HY+1;
+			} elif (not pos(hazard,HX+1,HY+1,_)) {
+				X = HX+1;
+				Y = HY+1;
+			} elif (not pos(hazard,HX-1,HY-1,_)) {
+				X = HX-1;
+				Y = HY-1;
+			} elif (not pos(hazard,HX+1,HY-1,_)) {
+				X = HX+1;
+				Y = HY-1;
+			}
+		}
+		else {
+			if (not pos(hazard,HX+1,HY+1,_)) {
+				X = HX+1;
+				Y = HY+1;
+			} elif (not pos(hazard,HX-1,HY+1,_)) {
+				X = HX-1;
+				Y = HY+1;
+			} elif (not pos(hazard,HX+1,HY-1,_)) {
+				X = HX+1;
+				Y = HY-1;
+			} elif (not pos(hazard,HX-1,HY-1,_)) {
+				X = HX-1;
+				Y = HY-1;
+			}
+		}
+
 	}
 	
 	-blocked[source(_)];
