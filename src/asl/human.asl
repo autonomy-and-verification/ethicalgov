@@ -128,6 +128,83 @@ goal_step(1).
 			}
 			FinalX = X+1;
 		}
+		else {
+			if (GX < HX & GY < HY) {
+				if (not pos(hazard,HX-1,HY-1,_)) {
+					FinalX = HX-1;
+					FinalY = HY-1;
+				} elif (not pos(hazard,HX-1,HY+1,_)) {
+					FinalX = HX-1;
+					FinalY = HY+1;
+				} elif (not pos(hazard,HX+1,HY-1,_)) {
+					FinalX = HX+1;
+					FinalY = HY-1;
+				} elif (not pos(hazard,HX+1,HY+1,_)) {
+					FinalX = HX+1;
+					FinalY = HY+1;
+				}
+			}
+			elif (GX > HX & GY > HY) {
+				if (not pos(hazard,HX+1,HY+1,_)) {
+					FinalX = HX+1;
+					FinalY = HY+1;
+				} elif (not pos(hazard,HX-1,HY+1,_)) {
+					FinalX = HX-1;
+					FinalY = HY+1;
+				} elif (not pos(hazard,HX+1,HY-1,_)) {
+					FinalX = HX+1;
+					FinalY = HY-1;
+				} elif (not pos(hazard,HX-1,HY-1,_)) {
+					FinalX = HX-1;
+					FinalY = HY-1;
+				}
+			}
+			elif (GX > HX & GY < HY) {
+				if (not pos(hazard,HX+1,HY-1,_)) {
+					FinalX = HX+1;
+					FinalY = HY-1;
+				} elif (not pos(hazard,HX+1,HY+1,_)) {
+					FinalX = HX+1;
+					FinalY = HY+1;
+				} elif (not pos(hazard,HX-1,HY-1,_)) {
+					FinalX = HX-1;
+					FinalY = HY-1;
+				} elif (not pos(hazard,HX-1,HY+1,_)) {
+					FinalX = HX-1;
+					FinalY = HY+1;
+				} 
+			}
+			elif (GX < HX & GY > HY) {
+				if (not pos(hazard,HX-1,HY+1,_)) {
+					FinalX = HX-1;
+					FinalY = HY+1;
+				} elif (not pos(hazard,HX+1,HY+1,_)) {
+					FinalX = HX+1;
+					FinalY = HY+1;
+				} elif (not pos(hazard,HX-1,HY-1,_)) {
+					FinalX = HX-1;
+					FinalY = HY-1;
+				} elif (not pos(hazard,HX+1,HY-1,_)) {
+					FinalX = HX+1;
+					FinalY = HY-1;
+				}
+			}
+			else {
+				if (not pos(hazard,HX+1,HY+1,_)) {
+					FinalX = HX+1;
+					FinalY = HY+1;
+				} elif (not pos(hazard,HX-1,HY+1,_)) {
+					FinalX = HX-1;
+					FinalY = HY+1;
+				} elif (not pos(hazard,HX+1,HY-1,_)) {
+					FinalX = HX+1;
+					FinalY = HY-1;
+				} elif (not pos(hazard,HX-1,HY-1,_)) {
+					FinalX = HX-1;
+					FinalY = HY-1;
+				}
+			}
+		}
 	} else {
 		FinalX = X;
 		FinalY = Y;
@@ -136,6 +213,12 @@ goal_step(1).
 	-blocked[source(_)];
 	
 	move(FinalX,FinalY);
+	.
+	
++!move(GX,GY) : blocked & pos(human,HX,HY) & not pos(hazard,HX-1,HY-1) & not pos(hazard,HX,HY-1) & not pos(hazard,HX+1,HY-1) & not pos(hazard,HX-1,HY) & not pos(hazard,HX+1,HY) & not pos(hazard,HX-1,HY+1) & not pos(hazard,HX,HY+1) & not pos(hazard,HX+1,HY+1)
+<-
+	-blocked[source(_)];
+	!move(GX,GY);
 	.
 	
 +!move(GX,GY) : blocked & pos(human,HX,HY)

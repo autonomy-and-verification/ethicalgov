@@ -70,16 +70,19 @@ public class EthGovs extends Environment {
 //	public Location loc3 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
 //	public Location loc4 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
 //	public Location loc5 = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1));
-	public Location loc1 = new Location(0, 8);
-	public Location loc2 = new Location(9, 3);
-	public Location loc3 = new Location(6, 3);
-	public Location loc4 = new Location(4, 2);
-	public Location loc5 = new Location(9, 5);
+	public Location loc1;
+	public Location loc2;
+	public Location loc3;
+	public Location loc4;
+	public Location loc5;
 //	public Location loc1 = new Location(9, 8);
 //	public Location loc2 = new Location(1, 9);
 //	public Location loc3 = new Location(8, 8);
 //	public Location loc4 = new Location(0, 1);
 //	public Location loc5 = new Location(7, 9);
+	
+	public Location humanLoc;
+	public Location robotLoc;
 	
 //	map 1
 //	7,5 human
@@ -108,11 +111,10 @@ public class EthGovs extends Environment {
 		  e.printStackTrace();
 	  }
 	  
-//		hazardsLocations.add(new Location(5, 3));
-		hazardsLocations.add(new Location(1, 1));
-//		hazardsLocations.add(new Location(6, 2));
-		hazardsLocations.add(new Location(4, 7));
-//		hazardsLocations.add(new Location(5, 4));
+	  	map1();
+//	  	map2();
+	  
+
     		 
         model = new EGModel();
         view  = new EGView(model);
@@ -120,7 +122,37 @@ public class EthGovs extends Environment {
         updatePercepts();
     } //This method is required at the start of every environment. This method becomes before anything else and prevented me from user input last year.
 
-    @Override
+    private void map1() {
+		hazardsLocations.add(new Location(2, 2));
+		hazardsLocations.add(new Location(4, 7));
+		
+		loc1 = new Location(0, 8);
+		loc2 = new Location(0, 5);
+		loc3 = new Location(6, 2);
+		loc4 = new Location(9, 3);
+		loc5 = new Location(8, 7);
+		
+		humanLoc = new Location(7, 5);
+		robotLoc = new Location(4, 9);
+}
+    
+    private void map2() {
+		hazardsLocations.add(new Location(2, 2));
+		hazardsLocations.add(new Location(7, 2));
+		hazardsLocations.add(new Location(2, 7));
+		hazardsLocations.add(new Location(7, 7));
+		
+		loc1 = new Location(4, 4);
+		loc2 = new Location(0, 0);
+		loc3 = new Location(0, 9);
+		loc4 = new Location(9, 0);
+		loc5 = new Location(9, 9);
+		
+		humanLoc = new Location(4, 5);
+		robotLoc = new Location(5, 5);
+}
+
+	@Override
     public boolean executeAction(String ag, Structure action) { //This is for picking up on any literals contained in the agents files
         try {
 			
@@ -277,10 +309,6 @@ public class EthGovs extends Environment {
             try {
 //				Location humanLoc = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1)); //Random locations on the board
 //				Location robotLoc = new Location(randomWithRange(0, GSize-1), randomWithRange(0, GSize-1)); //Random locations on the board
-				Location humanLoc = new Location(7, 5);
-				Location robotLoc = new Location(4, 9);
-//				Location humanLoc = new Location(0, 8);
-//				Location robotLoc = new Location(7, 2);
 //				try {
 //					FileWriter fr = new FileWriter(file, true);
 //					BufferedWriter br = new BufferedWriter(fr);
