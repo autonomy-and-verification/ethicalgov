@@ -325,7 +325,7 @@ public class EthGovs extends Environment {
 //				// TODO Auto-generated catch block
 //				e.printStackTrace();
 //			}
-//			addPercept("robot",newstep);
+			addPercept("robot",newstep);
 		}
 		
     }
