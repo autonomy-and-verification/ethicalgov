@@ -8,8 +8,8 @@
 
 +!act
 <-
-	for ( governor(Gov) ) {
-		.send(Gov, achieve, suggest_action);
+	for ( reasoner(Reasoner) ) {
+		.send(Reasoner, achieve, suggest_action);
 	}
 	.
 	

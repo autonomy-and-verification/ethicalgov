@@ -1,15 +1,17 @@
 goal_step(1).
+steps(0).
 
-+!act : not achieving_goal(_,_) & goal_step(Gstep)
++!act : not achieving_goal(_,_) & goal_step(Gstep) & steps(S)
 <-
 	.print("I am acting now");
 //	.wait(1000);
 	?goal(Gstep,X,Y);
 	+achieving_goal(X,Y);
+	-+steps(S+1);
 	!move(X,Y);
 	.
 	
-+!act : timer(0) & goal_step(Gstep)
++!act : timer(0) & goal_step(Gstep) & steps(S)
 <-
 	.print("I am acting now");
 //	.wait(1000);
@@ -22,7 +24,9 @@ goal_step(1).
 	else {
 		+goal_step(Gstep+1);
 	}
-	achieve;
+	-steps(S);
+	+steps(0);
+	achieve(S);
 	.
 	
 +!act : timer(T)
@@ -42,9 +46,10 @@ goal_step(1).
 	skip;
 	.
 	
-+!act : achieving_goal(X,Y)
++!act : achieving_goal(X,Y) & steps(S)
 <-
 	.print("I am acting now");
+	-+steps(S+1);
 //	.wait(1000);
 	!move(X,Y);
 	.
@@ -163,7 +168,7 @@ goal_step(1).
 				if (not pos(hazard,HX+1,HY-1,_)) {
 					FinalX = HX+1;
 					FinalY = HY-1;
-				} elif (not pos(hazard,HX+1,HY+1,_)) {
+				} elif (not pos(hazard,HX+1,HY+1,red)) {
 					FinalX = HX+1;
 					FinalY = HY+1;
 				} elif (not pos(hazard,HX-1,HY-1,_)) {

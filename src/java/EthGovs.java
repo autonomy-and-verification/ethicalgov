@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 public class EthGovs extends Environment {
 
-    public static final int GSize = 10; // grid size
+    public static final int GSize = 11; // grid size
     public static final int GOAL  = 16; // code in grid model
 	public static final int HAZARD_RED = 8; // code in grid model
 	public static final int HAZARD_ORANGE = 32; // code in grid model
@@ -39,11 +39,15 @@ public class EthGovs extends Environment {
 	public boolean blocked = false;
 	
 	public int step = 0;
-	public int block = 0;
-	public int hazards = 0;
+	public int warning = 0;
+	public int red = 0;
+	public int orange = 0;
+	public int yellow = 0;
 	public int goals = 0;
 	public int safety = 0;
 	public int autonomy = 0;
+	public int maxprox = 0;
+	public List<Integer> steps = new ArrayList<Integer>();
 	
 	int randomWithRange(int min, int max)
     {
@@ -58,6 +62,9 @@ public class EthGovs extends Environment {
 //	public Location hazLoc4 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
 //	public Location hazLoc5 = new Location(randomWithRange(1, GSize-2), randomWithRange(1, GSize-2));
 	public List<Location> hazardsLocations = new ArrayList<Location>();
+	public List<Location> redrad = new ArrayList<Location>();
+	public List<Location> orangerad = new ArrayList<Location>();
+	public List<Location> yellowrad = new ArrayList<Location>();
 //	public Location hazLoc1 = new Location(1, 3);
 //	public Location hazLoc2 = new Location(2, 3);
 //	public Location hazLoc3 = new Location(7, 6);
@@ -123,7 +130,7 @@ public class EthGovs extends Environment {
     } //This method is required at the start of every environment. This method becomes before anything else and prevented me from user input last year.
 
     private void map1() {
-		hazardsLocations.add(new Location(2, 2));
+		hazardsLocations.add(new Location(2, 3));
 		hazardsLocations.add(new Location(4, 7));
 		
 		loc1 = new Location(0, 8);
@@ -163,7 +170,7 @@ public class EthGovs extends Environment {
             	NumberTerm y = (NumberTerm) action.getTerm(1);
             	int newX = 0;
             	int newY = 0;
-            	if ((int) x.solve() >= 10) {
+            	if ((int) x.solve() >= 11) {
             		newX = (int) x.solve() - 1;
             	}
             	else if ((int) x.solve() < 0) {
@@ -172,7 +179,7 @@ public class EthGovs extends Environment {
             	else {
             		newX = (int) x.solve();
             	}
-            	if ((int) y.solve() >= 10) {
+            	if ((int) y.solve() >= 11) {
             		newY = (int) y.solve() - 1;
             	}
             	else if ((int) y.solve() < 0) {
@@ -184,16 +191,41 @@ public class EthGovs extends Environment {
             	model.humanMove(newX,newY); //Human can now move
             }  else if (ag.contentEquals("human") && action.getFunctor().equals("achieve")) {
             	goals++;
+            	NumberTerm s = (NumberTerm) action.getTerm(0);
+            	steps.add((int) s.solve());
+            }  else if (action.getFunctor().equals("updatemaxprox")) {
+            	NumberTerm s = (NumberTerm) action.getTerm(0);
+            	maxprox = (int) s.solve();
             } else if (ag.contentEquals("robot") && action.getFunctor().equals("move")) {
             	blocked = false;
             	NumberTerm x = (NumberTerm) action.getTerm(0);
             	NumberTerm y = (NumberTerm) action.getTerm(1);
-            	model.robotMove((int) x.solve(),(int) y.solve()); //Human can now move
+            	int newX = 0;
+            	int newY = 0;
+            	if ((int) x.solve() >= 11) {
+            		newX = (int) x.solve() - 1;
+            	}
+            	else if ((int) x.solve() < 0) {
+            		newX = (int) x.solve() + 1;
+            	}
+            	else {
+            		newX = (int) x.solve();
+            	}
+            	if ((int) y.solve() >= 11) {
+            		newY = (int) y.solve() - 1;
+            	}
+            	else if ((int) y.solve() < 0) {
+            		newY = (int) y.solve() + 1;
+            	}
+            	else {
+            		newY = (int) y.solve();
+            	}
+            	model.robotMove(newX,newY); //Human can now move
             } else if (ag.contentEquals("robot") && action.getFunctor().equals("block")) {
             	model.robotBlock();
-            } else if (ag.contentEquals("arbiter") && action.getFunctor().equals("safety")) {
+            } else if (ag.contentEquals("arbiter_agent") && action.getFunctor().equals("safety")) {
             	safety++;
-            } else if (ag.contentEquals("arbiter") && action.getFunctor().equals("autonomy")) {
+            } else if (ag.contentEquals("arbiter_agent") && action.getFunctor().equals("autonomy")) {
             	autonomy++;
             }
             
@@ -261,7 +293,7 @@ public class EthGovs extends Environment {
 				FileWriter fr = new FileWriter(file, true);
 				BufferedWriter br = new BufferedWriter(fr);
 				PrintWriter pr = new PrintWriter(br);
-				pr.println(block+","+hazards+","+goals+","+safety+","+autonomy);
+				pr.println(warning+","+red+","+orange+","+yellow+","+goals+","+safety+","+autonomy+","+maxprox+","+steps);
 				pr.close();
 				br.close();
 				fr.close();
@@ -276,7 +308,7 @@ public class EthGovs extends Environment {
 //            try {
 //                Thread.sleep(200000); // wait o.2 seconds before next reasoning cycle
 //            } catch (Exception e) {}
-			addPercept("arbiter",stop);
+			addPercept("arbiter_agent",stop);
 		} else {
 			// All percepts added
 	        addPercept(pos1);
@@ -293,7 +325,7 @@ public class EthGovs extends Environment {
 //				// TODO Auto-generated catch block
 //				e.printStackTrace();
 //			}
-			addPercept("robot",newstep);
+//			addPercept("robot",newstep);
 		}
 		
     }
@@ -359,6 +391,7 @@ public class EthGovs extends Environment {
 			Set<Location> set = new HashSet<Location>();
 			for(Location center : hazardsLocations) {
 				add(HAZARD_RED, center);
+				redrad.add(center);
 				set.add(center);
 			}
 			
@@ -368,6 +401,7 @@ public class EthGovs extends Environment {
 						Location loc = new Location(i,j);
 						if(!set.contains(loc) && center.distanceManhattan(loc) == 1) {
 							add(HAZARD_ORANGE, loc);
+							orangerad.add(loc);
 							set.add(loc);
 							break;
 						}
@@ -381,6 +415,7 @@ public class EthGovs extends Environment {
 						Location loc = new Location(i,j);
 						if(!set.contains(loc) && center.distanceManhattan(loc) == 2) {
 							add(HAZARD_YELLOW, loc);
+							yellowrad.add(loc);
 							set.add(loc);
 							break;
 						}
@@ -394,7 +429,7 @@ public class EthGovs extends Environment {
 		void robotBlock() {
 			Location robotLoc = getAgPos(1);
 			blocked = true;
-			block++;
+			warning++;
 			setAgPos(1,robotLoc);
 			System.out.println("Robot is blocking human");
 		}
@@ -423,10 +458,26 @@ public class EthGovs extends Environment {
 			Location robotLoc = getAgPos(1);
 			humanLoc.x = x;
 			humanLoc.y = y;
-			for(Location h : hazardsLocations) {
+			for(Location h : redrad) {
 				if(h.x == humanLoc.x && h.y == humanLoc.y) {
-					hazards++;	
-					logger.severe("HUMAN STEPPED ON HAZARD");
+					red++;	
+					logger.severe("HUMAN STEPPED ON RED RADIATION");
+					break;
+				}
+			}
+			
+			for(Location h : orangerad) {
+				if(h.x == humanLoc.x && h.y == humanLoc.y) {
+					orange++;	
+					logger.severe("HUMAN STEPPED ON ORANGE RADIATION");
+					break;
+				}
+			}
+			
+			for(Location h : yellowrad) {
+				if(h.x == humanLoc.x && h.y == humanLoc.y) {
+					yellow++;	
+					logger.severe("HUMAN STEPPED ON YELLOW RADIATION");
 					break;
 				}
 			}

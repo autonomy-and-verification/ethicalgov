@@ -3,9 +3,9 @@ count(0).
 !introductions.
 
 @receivelastchoice[atomic]
-+governor_choice(GovernorType, Choice, Utility) : .count(governor(_),N) & count(N-1) <- .print("Received all of the governors choices."); -count(_); +count(0); !arbiter_choice.
++reasoner_choice(ReasonerType, Choice, Utility) : .count(reasoner(_),N) & count(N-1) <- .print("Received all of the reasoners choices."); -count(_); +count(0); !arbiter_choice.
 @receivechoice[atomic]
-+governor_choice(GovernorType, Choice, Utility) : count(N) <- .print("Received a governor choice, waiting for the remaining choices."); -count(N); +count(N+1).
++reasoner_choice(ReasonerType, Choice, Utility) : count(N) <- .print("Received a reasoner choice, waiting for the remaining choices."); -count(N); +count(N+1).
 
 
 +!introductions 
@@ -19,24 +19,26 @@ count(0).
 <- 
 	+choice(0,0,0);
 	
-	for (governor_choice(GovernorType, Choice, Utility)) {
-		-governor_choice(GovernorType, Choice, Utility)[source(_)];
-		if ( type_multiplier(GovernorType, TypeMultiplier) ) { // type multiplier has to be set by the developer
+	for (reasoner_choice(ReasonerType, Choice, Utility)) {
+		-reasoner_choice(ReasonerType, Choice, Utility)[source(_)];
+		if ( type_multiplier(ReasonerType, TypeMultiplier) ) { // type multiplier has to be set by the developer
 			NewUtility = TypeMultiplier * Utility;
-		} else { // otherwise only the basic multiplier of the governor choice is used
+		} else { // otherwise only the basic multiplier of the reasoner choice is used
 			NewUtility = Utility;
 		}
-		?choice(CurrentUtility, GovernorTypeOld, ChoiceOld);
+		?choice(CurrentUtility, ReasonerTypeOld, ChoiceOld);
 		if (NewUtility > CurrentUtility) {
-			-choice(CurrentUtility, GovernorTypeOld, ChoiceOld);
-			+choice(NewUtility, GovernorType, Choice);
+			-choice(CurrentUtility, ReasonerTypeOld, ChoiceOld);
+			+choice(NewUtility, ReasonerType, Choice);
 		}
 	}
 	
-	?choice(Utility, GovernorType, Choice);
-	-choice(Utility, GovernorType, Choice);
+	?choice(Utility, ReasonerType, Choice);
+	-choice(Utility, ReasonerType, Choice);
 	
-	.print("Chose action proposal from ", GovernorType, " governor with utility ", Utility, " and with choice: ", Choice);
+	ReasonerType;
+	
+	.print("Chose action proposal from ", ReasonerType, " reasoner with utility ", Utility, " and with choice: ", Choice);
 	
 	.send(Agent, achieve, choice(Choice));
 .

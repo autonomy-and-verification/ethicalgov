@@ -1,4 +1,4 @@
-{ include("governor.asl") }
+{ include("reasoner.asl") }
 
 type(autonomy).
 

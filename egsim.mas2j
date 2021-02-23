@@ -5,8 +5,8 @@ MAS egsim {
 
     environment: EthGovs
 
-    agents: autonomygov;
-    		safetygov;
+    agents: autonomy;
+    		safety;
     		robot;
     		arbiter_agent;
     		human;
