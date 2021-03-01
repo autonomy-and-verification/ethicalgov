@@ -1,3 +1,4 @@
+package remoteinspection;
 
 import jason.asSyntax.*;
 import jason.environment.Environment;

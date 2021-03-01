@@ -3,7 +3,7 @@ MAS egsim {
 
     infrastructure: Centralised
 
-    environment: RemoteInsp
+    environment: remoteinspection.RemoteInsp
 
     agents: autonomy;
     		safety;
