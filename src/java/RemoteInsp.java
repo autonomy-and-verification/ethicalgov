@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 
-public class EthGovs extends Environment {
+public class RemoteInsp extends Environment {
 
     public static final int GSize = 11; // grid size
     public static final int GOAL  = 16; // code in grid model
@@ -31,7 +31,7 @@ public class EthGovs extends Environment {
 	public static final int HAZARD_YELLOW = 64; // code in grid model
 	
 
-    static Logger logger = Logger.getLogger(EthGovs.class.getName()); // We can use this as output for our simulation
+    static Logger logger = Logger.getLogger(RemoteInsp.class.getName()); // We can use this as output for our simulation
 
     private EGModel model; // In my project last year I had this as a separate file. Here the model is contained in the environment
     private EGView  view;
@@ -223,9 +223,9 @@ public class EthGovs extends Environment {
             	model.robotMove(newX,newY); //Human can now move
             } else if (ag.contentEquals("robot") && action.getFunctor().equals("block")) {
             	model.robotBlock();
-            } else if (ag.contentEquals("arbiter_agent") && action.getFunctor().equals("safety")) {
+            } else if (ag.contentEquals("robot") && action.getFunctor().equals("safety")) {
             	safety++;
-            } else if (ag.contentEquals("arbiter_agent") && action.getFunctor().equals("autonomy")) {
+            } else if (ag.contentEquals("robot") && action.getFunctor().equals("autonomy")) {
             	autonomy++;
             }
             
@@ -258,8 +258,8 @@ public class EthGovs extends Environment {
 		
 		// Locations of hazards as percepts
 		Set<Location> set = new HashSet<Location>();
-		for(int i = 0; i < EthGovs.GSize; i++) {
-			for(int j = 0; j < EthGovs.GSize; j++) {
+		for(int i = 0; i < RemoteInsp.GSize; i++) {
+			for(int j = 0; j < RemoteInsp.GSize; j++) {
 				for(Location center : hazardsLocations) {
 					Location loc = new Location(i,j);
 					if(!set.contains(loc) && center.distanceManhattan(loc) < 3) {
@@ -293,7 +293,7 @@ public class EthGovs extends Environment {
 				FileWriter fr = new FileWriter(file, true);
 				BufferedWriter br = new BufferedWriter(fr);
 				PrintWriter pr = new PrintWriter(br);
-				pr.println(warning+","+red+","+orange+","+yellow+","+goals+","+safety+","+autonomy+","+maxprox+","+steps);
+				pr.println(warning+","+red+","+orange+","+yellow+","+goals+","+maxprox+","+safety+","+autonomy+","+steps);
 				pr.close();
 				br.close();
 				fr.close();
@@ -395,8 +395,8 @@ public class EthGovs extends Environment {
 				set.add(center);
 			}
 			
-			for(int i = 0; i < EthGovs.GSize; i++) {
-				for(int j = 0; j < EthGovs.GSize; j++) {
+			for(int i = 0; i < RemoteInsp.GSize; i++) {
+				for(int j = 0; j < RemoteInsp.GSize; j++) {
 					for(Location center : hazardsLocations) {
 						Location loc = new Location(i,j);
 						if(!set.contains(loc) && center.distanceManhattan(loc) == 1) {
@@ -409,8 +409,8 @@ public class EthGovs extends Environment {
 				}
 			}
 			
-			for(int i = 0; i < EthGovs.GSize; i++) {
-				for(int j = 0; j < EthGovs.GSize; j++) {
+			for(int i = 0; i < RemoteInsp.GSize; i++) {
+				for(int j = 0; j < RemoteInsp.GSize; j++) {
 					for(Location center : hazardsLocations) {
 						Location loc = new Location(i,j);
 						if(!set.contains(loc) && center.distanceManhattan(loc) == 2) {
@@ -431,7 +431,7 @@ public class EthGovs extends Environment {
 			blocked = true;
 			warning++;
 			setAgPos(1,robotLoc);
-			System.out.println("Robot is blocking human");
+//			System.out.println("Robot is blocking human");
 		}
 		
 		void robotMove(int x, int y) throws Exception {
@@ -522,13 +522,13 @@ public class EthGovs extends Environment {
         @Override
         public void draw(Graphics g, int x, int y, int object) { // Uses the methods to draw the defined objects i.e. drawGarb()
             switch (object) {
-				case EthGovs.GOAL:
+				case RemoteInsp.GOAL:
 					drawGoal(g, x, y);
 //					logger.info("Goal pos "+g+" "+x+" "+y);
 					break; //Going to have to modify this bit for the hazard
-				case EthGovs.HAZARD_RED:
-				case EthGovs.HAZARD_ORANGE:
-				case EthGovs.HAZARD_YELLOW:
+				case RemoteInsp.HAZARD_RED:
+				case RemoteInsp.HAZARD_ORANGE:
+				case RemoteInsp.HAZARD_YELLOW:
 					drawHazard(g, x, y, object);
 //					logger.info("Hazard pos "+g+" "+x+" "+y);
 					break;
@@ -538,16 +538,15 @@ public class EthGovs extends Environment {
         @Override
         public void drawAgent(Graphics g, int x, int y, Color c, int id) { // Method for drawing the agent. This is all purely for visual purposes
 			String label;
-			if(blocked) System.out.println("id: " + id);
 			if(model.getAgPos(0).x == model.getAgPos(1).x && model.getAgPos(0).y == model.getAgPos(1).y) {
 				if(blocked) {
-					g.setColor(Color.black);
+					g.setColor(Color.red);
 				} else {
 					g.setColor(Color.green);
 				}
 				g.fillRect(x * cellSizeW + 10, y * cellSizeH + 10, cellSizeW-20, cellSizeH-20);
 				g.setColor(Color.white);
-				super.drawString(g, x, y, defaultFont, blocked ? "Blk" : "R+H");
+				super.drawString(g, x, y, defaultFont, blocked ? "Wrn!" : "R+H");
 			} else {
 				if(id == 0) {
 					g.setColor(Color.pink);

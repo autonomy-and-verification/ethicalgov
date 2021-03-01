@@ -3,7 +3,7 @@ MAS egsim {
 
     infrastructure: Centralised
 
-    environment: EthGovs
+    environment: RemoteInsp
 
     agents: autonomy;
     		safety;
@@ -12,5 +12,6 @@ MAS egsim {
     		human;
     
     aslSourcePath:
-		"src/asl";
+		"src/asl/abstraction";
+		"src/asl/remoteinspection";
 }

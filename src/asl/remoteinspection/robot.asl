@@ -1,3 +1,21 @@
+{ include("execution_agent.asl") }
+
+!start.
+
+@start[atomic]
++!start
+<-
+	.wait(500); // necessary for the setup messages to go through first
+	.
+	
++new_step(Step)
+<- 
+	-new_step(Step)[source(_)];
+ 	!act;
+ 	.
+	
++!execute_action(Action, ReasonerType) <- ReasonerType; !Action.
+
 +!human_step
 <- 
 	.send(human, achieve, act);
@@ -5,45 +23,40 @@
 	
 	
 // safety move towards human
-+choice(11)
++!moveToward
 <-
-	.print("Choice 11");
-	-choice(_)[source(_)];
+	.print("Choice moveToward");
 	!move_towards;
 	!human_step;
 	.
 	
 // safety stay put
-+choice(12)
++!stayPutS
 <-
-	.print("Choice 12");
-	-choice(_)[source(_)];
+	.print("Choice stayPutS");
 	!human_step;
 	.
 	
 // safety block human
-+choice(13)
++!prevent
 <-
-	.print("Choice 13");
-	-choice(_)[source(_)];
+	.print("Choice prevent");
 	block;
 	.send(human,tell,blocked);
 	!human_step;
 	.
 
 // autonomy stay put
-+choice(21)
++!stayPutA
 <-
-	.print("Choice 21");
-	-choice(_)[source(_)];
+	.print("Choice stayPutA");
 	!human_step;
 	.
 
 // autonomy move away from human
-+choice(22)
++!moveAway
 <-
-	.print("Choice 22");
-	-choice(_)[source(_)];
+	.print("Choice moveAway");
 	!move_away;
 	!human_step;
 	.
@@ -74,19 +87,19 @@
 	
 +!move_away : pos(robot,RX,RY) & pos(human,HX,HY)
 <-
-	if ((RX <= HX)  & (RX - 1 >= 0)) {
+	if (RX < HX) {
 		X = RX - 1;
 	}
-	elif ((RX > HX)  & (RX + 1 >= 10)) {
+	elif (RX > HX) {
 		X = RX + 1;
 	}
 	else {
 		X = RX;
 	}
-	if ((RY <= HY)  & (RY - 1 >= 0)) {
+	if (RY < HY) {
 		Y = RY - 1;
 	}
-	elif ((RY > HY)  & (RY + 1 >= 10)) {
+	elif (RY > HY)  {
 		Y = RY + 1;
 	}
 	else {
