@@ -25,3 +25,6 @@ gradle-app.setting
 
 # Cache of project
 .gradletasknamecache
+
+# Results of experiments
+results.csv
