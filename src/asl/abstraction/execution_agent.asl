@@ -13,8 +13,12 @@
 	}
 	.
 	
-+!choice(Action, ReasonerType)
++!choice(ActionList)
+	: .list(ActionList)
 <-
-	!execute_action(Action, ReasonerType); // this is domain specific and has to be written by the developer
-	.
+	!select_action(ActionList, action(Action, ReasonerType)); // this is domain specific and has to be written by the developer
+	!execute_action(Action, ReasonerType). // this is domain specific and has to be written by the developer
 	
++!choice(action(Action, ReasonerType))
+<-
+	!execute_action(Action, ReasonerType). // this is domain specific and has to be written by the developer

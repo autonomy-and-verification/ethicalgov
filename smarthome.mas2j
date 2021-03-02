@@ -1,0 +1,16 @@
+
+MAS egsim {
+
+    infrastructure: Centralised
+
+    environment: smarthome.SmartHome
+
+    agents: autonomy;
+    		safety;
+    		house;
+    		arbiter_agent;
+    
+    aslSourcePath:
+		"src/asl/abstraction";
+		"src/asl/smarthome";
+}

@@ -14,7 +14,7 @@ count(0).
 	.broadcast(tell, arbiter(Me));
 	.
 
-@arbiterchoice[atomic]
+@utilitarian[atomic]
 +!arbiter_choice : reasoning(utilitarian) & execution_agent(Agent) 
 <- 
 	+choice(0,0,0);
@@ -38,5 +38,41 @@ count(0).
 	
 	.print("Chose action proposal from ", Type, " reasoner with utility ", Utility, " and with choice: ", Action);
 	
-	.send(Agent, achieve, choice(Action, Type));
-.
+	.send(Agent, achieve, choice(action(Action, Type)));
+	.
+
+@deontic[atomic]
++!arbiter_choice : reasoning(deontic) & execution_agent(Agent) 
+<- 
+	for (evidential_reasoner_choice(Type, Action, yes)) {
+		-evidential_reasoner_choice(Type, Action, yes);
+		+choice(action(Action, Type));
+	}
+	
+	if (not choice(_, _)) {
+		for (evidential_reasoner_choice(Type, Action, maybe)) {
+			-evidential_reasoner_choice(Type, Action, maybe);
+			if (not choice(_, _) & type_rank(Type, Rank)) {
+				+rank(Rank);
+				+choice(action(Action, Type));
+			}
+			elif (rank(BestRank) & type_rank(Type, Rank) & Rank < BestRank  & choice(action(OldAction, OldType))) {
+				-rank(BestRank); 
+				+rank(Rank);
+				-choice(action(OldAction, OldType));
+				+choice(action(Action, Type));
+			}
+		}
+	}
+	
+	for (evidential_reasoner_choice(Type, Action, no)) {
+		-evidential_reasoner_choice(Type, Action, no);
+	}
+    
+	if (not choice(_, _)) {
+		+choice(action(null, null));
+	}
+    
+	.findall(action(Action,Type), choice(action(Action, Type), ActionList));
+	.send(Agent, achieve, choice(ActionList));
+	.
