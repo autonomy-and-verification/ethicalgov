@@ -1,26 +1,24 @@
 { include("reasoner.asl") }
 
-type(safety).
+type(privacy).
 
 +!make_choice(Choice, Recommendation)
-	: parents_home
+	: not repeated_occurence
 <- 
-	Choice = warn_parents;
+	Choice = warn_teenager;
 	Recommendation = yes;
 	.
-	
+
 +!make_choice(Choice, Recommendation)
-	: not tobacco_illegal & not parents_home
+	: repeated_occurence & parents_home
 <- 
-	Choice = warn_parents;
+	Choice = warn_teenager;
 	Recommendation = no;
 	.
 
 +!make_choice(Choice, Recommendation)
 <- 
-	Choice = warn_parents;
+	Choice = warn_teenager;
 	Recommendation = maybe;
 	.
-	
-
 	

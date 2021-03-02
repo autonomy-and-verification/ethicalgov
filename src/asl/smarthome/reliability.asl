@@ -1,26 +1,23 @@
 { include("reasoner.asl") }
 
-type(safety).
+type(reliability).
 
 +!make_choice(Choice, Recommendation)
-	: parents_home
+	: not log_disabled & smoke(Smoke) & Smoke > 100
 <- 
-	Choice = warn_parents;
+	Choice = log_activity;
 	Recommendation = yes;
 	.
 	
 +!make_choice(Choice, Recommendation)
-	: not tobacco_illegal & not parents_home
+	: log_disabled
 <- 
-	Choice = warn_parents;
+	Choice = log_activity;
 	Recommendation = no;
 	.
 
 +!make_choice(Choice, Recommendation)
 <- 
-	Choice = warn_parents;
+	Choice = log_activity;
 	Recommendation = maybe;
 	.
-	
-
-	

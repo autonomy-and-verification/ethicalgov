@@ -1,26 +1,24 @@
 { include("reasoner.asl") }
 
-type(safety).
+type(legal).
 
 +!make_choice(Choice, Recommendation)
-	: parents_home
+	: tobacco_illegal & repeated_occurence & not parents_home
 <- 
-	Choice = warn_parents;
+	Choice = warn_authorities;
 	Recommendation = yes;
 	.
 	
 +!make_choice(Choice, Recommendation)
-	: not tobacco_illegal & not parents_home
+	: not tobacco_illegal
 <- 
-	Choice = warn_parents;
+	Choice = warn_authorities;
 	Recommendation = no;
 	.
 
 +!make_choice(Choice, Recommendation)
 <- 
-	Choice = warn_parents;
+	Choice = warn_authorities;
 	Recommendation = maybe;
 	.
-	
-
 	

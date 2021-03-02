@@ -49,10 +49,10 @@ count(0).
 		+choice(action(Action, Type));
 	}
 	
-	if (not choice(_, _)) {
+	if (not choice(_)) {
 		for (evidential_reasoner_choice(Type, Action, maybe)) {
 			-evidential_reasoner_choice(Type, Action, maybe);
-			if (not choice(_, _) & type_rank(Type, Rank)) {
+			if (not choice(_) & type_rank(Type, Rank)) {
 				+rank(Rank);
 				+choice(action(Action, Type));
 			}
@@ -68,11 +68,11 @@ count(0).
 	for (evidential_reasoner_choice(Type, Action, no)) {
 		-evidential_reasoner_choice(Type, Action, no);
 	}
-    
-	if (not choice(_, _)) {
+	if (not choice(_)) {
 		+choice(action(null, null));
 	}
     
-	.findall(action(Action,Type), choice(action(Action, Type), ActionList));
+	.findall(action(Action,Type), choice(action(Action, Type)), ActionList);
+	.abolish(choice(_));
 	.send(Agent, achieve, choice(ActionList));
 	.

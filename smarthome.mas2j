@@ -3,10 +3,10 @@ MAS egsim {
 
     infrastructure: Centralised
 
-    environment: smarthome.SmartHome
-
-    agents: autonomy;
+    agents: privacy;
     		safety;
+    		legal;
+    		reliability;
     		house;
     		arbiter_agent;
     
