@@ -554,7 +554,7 @@ public class RemoteInsp extends Environment {
 					label = "H";
 				} else {
 					if(blocked) {
-						g.setColor(Color.red);
+						g.setColor(new Color(1f, 0f, 0f, 0.5f));
 						label = "Wrn!";
 					} else {
 						g.setColor(Color.blue);
@@ -573,8 +573,8 @@ public class RemoteInsp extends Environment {
 		public void drawGoal(Graphics g, int x, int y) { // To be used in the draw() method.
             g.setColor(Color.green);
 			//g.fillOval(x * cellSizeW + 10, y * cellSizeH + 10, cellSizeW-20, cellSizeH-20);
-			g.drawPolygon(new int[] {x * cellSizeW + 5, x * cellSizeW + ((int)(cellSizeW/2)), x * cellSizeW + cellSizeW - 5}, new int[] {y * cellSizeH + (cellSizeH / 4), y * cellSizeH  + (cellSizeH - 5), y * cellSizeH + (cellSizeH / 4)}, 3);
-			g.setColor(Color.black);
+			g.fillPolygon(new int[] {x * cellSizeW + 5, x * cellSizeW + ((int)(cellSizeW/2)), x * cellSizeW + cellSizeW - 5}, new int[] {y * cellSizeH + (cellSizeH / 4), y * cellSizeH  + (cellSizeH - 5), y * cellSizeH + (cellSizeH / 4)}, 3);
+			g.setColor(Color.white);
             drawString(g, x, y, defaultFont, "G");
         }
 		
@@ -585,7 +585,7 @@ public class RemoteInsp extends Environment {
 					g.setColor(new Color(1f, 0f, 0f, 0.5f));	
 					break;
 				case HAZARD_ORANGE:
-					g.setColor(Color.orange);
+					g.setColor(new Color(1f, 0.4f, 0f, 0.5f));
 					break;
 				case HAZARD_YELLOW:
 					g.setColor(Color.yellow);
